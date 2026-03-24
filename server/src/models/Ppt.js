@@ -1,0 +1,14 @@
+import mongoose from "mongoose";
+
+const pptSchema = new mongoose.Schema(
+  {
+    journal_id: { type: mongoose.Schema.Types.ObjectId, ref: "Journal", required: true, index: true },
+    title: { type: String, required: true },
+    file_url: String,
+    file_public_id: String,
+    format: String
+  },
+  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
+);
+
+export const Ppt = mongoose.model("Ppt", pptSchema);
