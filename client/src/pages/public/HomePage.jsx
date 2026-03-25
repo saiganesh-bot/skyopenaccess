@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { http } from "../../api/http";
+
+const cleanText = (html = "") => html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 
 export const HomePage = () => {
   const [journals, setJournals] = useState([]);
@@ -32,13 +35,14 @@ export const HomePage = () => {
         <h2>Available Journals</h2>
         <div className="grid">
           {journals.map((journal) => (
-            <article className="card" key={journal._id}>
+            <Link className="card journal-link-card" key={journal._id} to={`/journals/${journal.slug}`}>
               {journal.cover_image_url ? (
                 <img src={journal.cover_image_url} alt={journal.title} className="journal-cover" />
               ) : null}
               <h3>{journal.title}</h3>
-              <p>{journal.about || "No description yet."}</p>
-            </article>
+              <p>{cleanText(journal.about).slice(0, 150) || "No description yet."}</p>
+              <span className="inline-link">View journal content</span>
+            </Link>
           ))}
           {!journals.length ? <p>No journals available yet.</p> : null}
         </div>

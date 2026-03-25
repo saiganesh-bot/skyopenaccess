@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { RichTextEditor } from "../../components/RichTextEditor";
 import { http } from "../../api/http";
 
 const initialJournal = {
@@ -15,6 +16,8 @@ export const AdminDashboardPage = () => {
   const [logos, setLogos] = useState([]);
   const [submissions, setSubmissions] = useState([]);
   const [journalForm, setJournalForm] = useState(initialJournal);
+  const [editingId, setEditingId] = useState("");
+  const [editJournalForm, setEditJournalForm] = useState(initialJournal);
   const [logoFile, setLogoFile] = useState(null);
 
   const loadData = async () => {
@@ -32,6 +35,20 @@ export const AdminDashboardPage = () => {
     loadData().catch(console.error);
   }, []);
 
+  useEffect(() => {
+    if (!journals.length) return;
+    if (editingId) return;
+    const first = journals[0];
+    setEditingId(first._id);
+    setEditJournalForm({
+      title: first.title || "",
+      about: first.about || "",
+      aim_scope: first.aim_scope || "",
+      author_guidelines: first.author_guidelines || "",
+      cover: null
+    });
+  }, [journals, editingId]);
+
   const createJournal = async (e) => {
     e.preventDefault();
     const data = new FormData();
@@ -48,6 +65,37 @@ export const AdminDashboardPage = () => {
 
   const deleteJournal = async (id) => {
     await http.delete(`/journals/${id}`);
+    if (editingId === id) {
+      setEditingId("");
+      setEditJournalForm(initialJournal);
+    }
+    await loadData();
+  };
+
+  const setActiveJournalForEdit = (journal) => {
+    setEditingId(journal._id);
+    setEditJournalForm({
+      title: journal.title || "",
+      about: journal.about || "",
+      aim_scope: journal.aim_scope || "",
+      author_guidelines: journal.author_guidelines || "",
+      cover: null
+    });
+  };
+
+  const updateJournal = async (e) => {
+    e.preventDefault();
+    if (!editingId) return;
+
+    const data = new FormData();
+    data.append("title", editJournalForm.title);
+    data.append("about", editJournalForm.about);
+    data.append("aim_scope", editJournalForm.aim_scope);
+    data.append("author_guidelines", editJournalForm.author_guidelines);
+    if (editJournalForm.cover) data.append("cover", editJournalForm.cover);
+
+    await http.put(`/journals/${editingId}`, data);
+    setEditJournalForm((prev) => ({ ...prev, cover: null }));
     await loadData();
   };
 
@@ -135,11 +183,90 @@ export const AdminDashboardPage = () => {
         {journals.map((journal) => (
           <div key={journal._id} className="item-row">
             <span>{journal.title}</span>
-            <button onClick={() => deleteJournal(journal._id)} className="danger-btn" type="button">
-              Delete
-            </button>
+            <div className="actions">
+              <button onClick={() => setActiveJournalForEdit(journal)} type="button">Edit</button>
+              <button onClick={() => deleteJournal(journal._id)} className="danger-btn" type="button">
+                Delete
+              </button>
+            </div>
           </div>
         ))}
+      </section>
+
+      <section className="form-card full-width">
+        <h2>Update Journal Content</h2>
+        <p>Use rich editor controls on the left and write content on the right panel.</p>
+        <form onSubmit={updateJournal} className="form-grid">
+          <label>
+            Select Journal
+            <select
+              required
+              value={editingId}
+              onChange={(e) => {
+                const selected = journals.find((journal) => journal._id === e.target.value);
+                if (selected) setActiveJournalForEdit(selected);
+              }}
+            >
+              <option value="">Select Journal</option>
+              {journals.map((journal) => (
+                <option key={journal._id} value={journal._id}>{journal.title}</option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            Title
+            <input
+              required
+              value={editJournalForm.title}
+              onChange={(e) => setEditJournalForm((prev) => ({ ...prev, title: e.target.value }))}
+            />
+          </label>
+
+          <label>
+            About Section
+            <RichTextEditor
+              value={editJournalForm.about}
+              onChange={(value) => setEditJournalForm((prev) => ({ ...prev, about: value }))}
+              placeholder="Write journal about section with bold and highlights..."
+            />
+          </label>
+
+          <label>
+            Aim and Scope
+            <RichTextEditor
+              value={editJournalForm.aim_scope}
+              onChange={(value) => setEditJournalForm((prev) => ({ ...prev, aim_scope: value }))}
+              placeholder="Write aim and scope..."
+            />
+          </label>
+
+          <label>
+            Author Guidelines
+            <RichTextEditor
+              value={editJournalForm.author_guidelines}
+              onChange={(value) =>
+                setEditJournalForm((prev) => ({ ...prev, author_guidelines: value }))
+              }
+              placeholder="Write author guidelines..."
+            />
+          </label>
+
+          <label>
+            Replace Cover
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) =>
+                setEditJournalForm((prev) => ({ ...prev, cover: e.target.files?.[0] || null }))
+              }
+            />
+          </label>
+
+          <button className="primary-btn" type="submit" disabled={!editingId}>
+            Update Journal
+          </button>
+        </form>
       </section>
 
       <section className="form-card">
