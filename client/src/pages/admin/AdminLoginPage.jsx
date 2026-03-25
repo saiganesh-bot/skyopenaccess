@@ -37,8 +37,13 @@ export const AdminLoginPage = () => {
       }
     } catch (err) {
       const message = err.response?.data?.message || "Login failed";
+      const requiresEmailVerification = Boolean(err.response?.data?.requiresEmailVerification);
+      const fallbackCode = err.response?.data?.devVerificationCode;
       setError(message);
-      if (message.toLowerCase().includes("not verified")) {
+      if (fallbackCode) {
+        setDevCode(`Dev verification code: ${fallbackCode}`);
+      }
+      if (requiresEmailVerification || message.toLowerCase().includes("not verified")) {
         setStep("verifyEmail");
       }
     }

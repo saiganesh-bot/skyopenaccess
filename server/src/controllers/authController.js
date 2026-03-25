@@ -135,7 +135,7 @@ export const loginAdmin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   const normalizedEmail = String(email || "").trim().toLowerCase();
 
-  const user = await User.findOne({ email: normalizedEmail }).select("+password isEmailVerified");
+  const user = await User.findOne({ email: normalizedEmail }).select("+password isEmailVerified name");
   if (!user) {
     return res.status(401).json({ message: "Invalid credentials" });
   }
@@ -145,8 +145,26 @@ export const loginAdmin = asyncHandler(async (req, res) => {
     return res.status(401).json({ message: "Invalid credentials" });
   }
 
-  if (!user.isEmailVerified) {
-    return res.status(403).json({ message: "Admin Gmail is not verified. Verify email before login." });
+  if (user.isEmailVerified === false) {
+    const verificationCode = generateOtpCode();
+    user.emailVerificationCodeHash = await bcrypt.hash(verificationCode, 10);
+    user.emailVerificationCodeExpiresAt = otpExpiry();
+    await user.save();
+
+    const delivered = await sendAdminVerificationEmail({
+      to: user.email,
+      adminName: user.name,
+      code: verificationCode
+    });
+
+    return res.status(403).json({
+      message: delivered
+        ? "Admin Gmail is not verified. Verification code was sent."
+        : "Admin Gmail is not verified. Use resend verification or check SMTP.",
+      requiresEmailVerification: true,
+      devVerificationCode:
+        delivered || process.env.NODE_ENV === "production" ? undefined : verificationCode
+    });
   }
 
   const twoFactorCode = generateOtpCode();
