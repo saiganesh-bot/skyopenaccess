@@ -26,8 +26,7 @@ export const AdminLoginPage = () => {
       if (data.requiresTwoFactor && data.challengeToken) {
         setChallengeToken(data.challengeToken);
         setStep("twoFactor");
-        setInfo(data.message || "Enter the verification code sent to your Gmail.");
-        if (data.devTwoFactorCode) setDevCode(`Dev OTP: ${data.devTwoFactorCode}`);
+        setInfo(data.message || "Enter the code from your authenticator app.");
         return;
       }
 
@@ -125,7 +124,7 @@ export const AdminLoginPage = () => {
         {step === "twoFactor" ? (
           <form onSubmit={submitTwoFactor} className="form-grid">
             <label>
-              2FA Code
+              Authenticator Code
               <input
                 type="text"
                 value={twoFactorCode}

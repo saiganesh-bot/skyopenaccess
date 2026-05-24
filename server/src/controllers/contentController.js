@@ -1,4 +1,5 @@
 import { cloudinary } from "../config/cloudinary.js";
+import mongoose from "mongoose";
 import { ArchiveArticle } from "../models/ArchiveArticle.js";
 import { ArchiveVolume } from "../models/ArchiveVolume.js";
 import { Article } from "../models/Article.js";
@@ -30,6 +31,15 @@ const safeDestroy = async (publicId, resourceType) => {
   await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
 };
 
+const getValidatedObjectId = (id, resourceLabel = "Resource") => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    const err = new Error(`Invalid ${resourceLabel} id`);
+    err.statusCode = 400;
+    throw err;
+  }
+  return id;
+};
+
 export const listArticles = asyncHandler(async (req, res) => {
   const query = req.query.journal_id ? { journal_id: req.query.journal_id } : {};
   const articles = await Article.find(query).sort({ createdAt: -1 });
@@ -37,7 +47,7 @@ export const listArticles = asyncHandler(async (req, res) => {
 });
 
 export const getArticle = asyncHandler(async (req, res) => {
-  const article = await Article.findById(req.params.id);
+  const article = await Article.findById(getValidatedObjectId(req.params.id, "article"));
   if (!article) return res.status(404).json({ message: "Article not found" });
   res.status(200).json({ article });
 });
@@ -58,7 +68,7 @@ export const createArticle = asyncHandler(async (req, res) => {
 });
 
 export const updateArticle = asyncHandler(async (req, res) => {
-  const article = await Article.findById(req.params.id);
+  const article = await Article.findById(getValidatedObjectId(req.params.id, "article"));
   if (!article) return res.status(404).json({ message: "Article not found" });
 
   Object.assign(article, req.body);
@@ -77,7 +87,7 @@ export const updateArticle = asyncHandler(async (req, res) => {
 });
 
 export const deleteArticle = asyncHandler(async (req, res) => {
-  const article = await Article.findById(req.params.id);
+  const article = await Article.findById(getValidatedObjectId(req.params.id, "article"));
   if (!article) return res.status(404).json({ message: "Article not found" });
   await safeDestroy(article.pdf_public_id, "raw");
   await article.deleteOne();
@@ -91,7 +101,7 @@ export const listBoardMembers = asyncHandler(async (req, res) => {
 });
 
 export const getBoardMember = asyncHandler(async (req, res) => {
-  const member = await BoardMember.findById(req.params.id);
+  const member = await BoardMember.findById(getValidatedObjectId(req.params.id, "board member"));
   if (!member) return res.status(404).json({ message: "Board member not found" });
   res.status(200).json({ member });
 });
@@ -111,7 +121,7 @@ export const createBoardMember = asyncHandler(async (req, res) => {
 });
 
 export const updateBoardMember = asyncHandler(async (req, res) => {
-  const member = await BoardMember.findById(req.params.id);
+  const member = await BoardMember.findById(getValidatedObjectId(req.params.id, "board member"));
   if (!member) return res.status(404).json({ message: "Board member not found" });
 
   Object.assign(member, req.body);
@@ -130,7 +140,7 @@ export const updateBoardMember = asyncHandler(async (req, res) => {
 });
 
 export const deleteBoardMember = asyncHandler(async (req, res) => {
-  const member = await BoardMember.findById(req.params.id);
+  const member = await BoardMember.findById(getValidatedObjectId(req.params.id, "board member"));
   if (!member) return res.status(404).json({ message: "Board member not found" });
   await safeDestroy(member.image_public_id, "image");
   await member.deleteOne();
@@ -160,7 +170,7 @@ export const listCurrentIssues = asyncHandler(async (req, res) => {
 });
 
 export const getCurrentIssue = asyncHandler(async (req, res) => {
-  const issue = await CurrentIssue.findById(req.params.id);
+  const issue = await CurrentIssue.findById(getValidatedObjectId(req.params.id, "current issue"));
   if (!issue) return res.status(404).json({ message: "Current issue not found" });
   const hydrated = await attachIssueArticles([issue]);
   res.status(200).json({ issue: hydrated[0] });
@@ -184,7 +194,7 @@ export const createCurrentIssue = asyncHandler(async (req, res) => {
 });
 
 export const updateCurrentIssue = asyncHandler(async (req, res) => {
-  const issue = await CurrentIssue.findById(req.params.id);
+  const issue = await CurrentIssue.findById(getValidatedObjectId(req.params.id, "current issue"));
   if (!issue) return res.status(404).json({ message: "Current issue not found" });
 
   if (req.body.journal_id) issue.journal_id = req.body.journal_id;
@@ -206,7 +216,7 @@ export const updateCurrentIssue = asyncHandler(async (req, res) => {
 });
 
 export const deleteCurrentIssue = asyncHandler(async (req, res) => {
-  const issue = await CurrentIssue.findById(req.params.id);
+  const issue = await CurrentIssue.findById(getValidatedObjectId(req.params.id, "current issue"));
   if (!issue) return res.status(404).json({ message: "Current issue not found" });
   await CurrentIssueArticle.deleteMany({ issue_id: issue._id });
   await issue.deleteOne();
@@ -236,7 +246,7 @@ export const listArchiveVolumes = asyncHandler(async (req, res) => {
 });
 
 export const getArchiveVolume = asyncHandler(async (req, res) => {
-  const volume = await ArchiveVolume.findById(req.params.id);
+  const volume = await ArchiveVolume.findById(getValidatedObjectId(req.params.id, "archive volume"));
   if (!volume) return res.status(404).json({ message: "Archive volume not found" });
   const hydrated = await attachArchiveArticles([volume]);
   res.status(200).json({ volume: hydrated[0] });
@@ -261,7 +271,7 @@ export const createArchiveVolume = asyncHandler(async (req, res) => {
 });
 
 export const updateArchiveVolume = asyncHandler(async (req, res) => {
-  const volume = await ArchiveVolume.findById(req.params.id);
+  const volume = await ArchiveVolume.findById(getValidatedObjectId(req.params.id, "archive volume"));
   if (!volume) return res.status(404).json({ message: "Archive volume not found" });
 
   if (req.body.journal_id) volume.journal_id = req.body.journal_id;
@@ -284,7 +294,7 @@ export const updateArchiveVolume = asyncHandler(async (req, res) => {
 });
 
 export const deleteArchiveVolume = asyncHandler(async (req, res) => {
-  const volume = await ArchiveVolume.findById(req.params.id);
+  const volume = await ArchiveVolume.findById(getValidatedObjectId(req.params.id, "archive volume"));
   if (!volume) return res.status(404).json({ message: "Archive volume not found" });
   await ArchiveArticle.deleteMany({ volume_id: volume._id });
   await volume.deleteOne();
@@ -298,7 +308,7 @@ export const listVideos = asyncHandler(async (req, res) => {
 });
 
 export const getVideo = asyncHandler(async (req, res) => {
-  const video = await Video.findById(req.params.id);
+  const video = await Video.findById(getValidatedObjectId(req.params.id, "video"));
   if (!video) return res.status(404).json({ message: "Video not found" });
   res.status(200).json({ video });
 });
@@ -309,13 +319,16 @@ export const createVideo = asyncHandler(async (req, res) => {
 });
 
 export const updateVideo = asyncHandler(async (req, res) => {
-  const video = await Video.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+  const video = await Video.findByIdAndUpdate(getValidatedObjectId(req.params.id, "video"), req.body, {
+    new: true,
+    runValidators: true
+  });
   if (!video) return res.status(404).json({ message: "Video not found" });
   res.status(200).json({ video });
 });
 
 export const deleteVideo = asyncHandler(async (req, res) => {
-  const video = await Video.findById(req.params.id);
+  const video = await Video.findById(getValidatedObjectId(req.params.id, "video"));
   if (!video) return res.status(404).json({ message: "Video not found" });
   await video.deleteOne();
   res.status(200).json({ message: "Video deleted" });
@@ -328,7 +341,7 @@ export const listPpts = asyncHandler(async (req, res) => {
 });
 
 export const getPpt = asyncHandler(async (req, res) => {
-  const ppt = await Ppt.findById(req.params.id);
+  const ppt = await Ppt.findById(getValidatedObjectId(req.params.id, "ppt"));
   if (!ppt) return res.status(404).json({ message: "PPT not found" });
   res.status(200).json({ ppt });
 });
@@ -354,7 +367,7 @@ export const createPpt = asyncHandler(async (req, res) => {
 });
 
 export const updatePpt = asyncHandler(async (req, res) => {
-  const ppt = await Ppt.findById(req.params.id);
+  const ppt = await Ppt.findById(getValidatedObjectId(req.params.id, "ppt"));
   if (!ppt) return res.status(404).json({ message: "PPT not found" });
 
   Object.assign(ppt, req.body);
@@ -374,7 +387,7 @@ export const updatePpt = asyncHandler(async (req, res) => {
 });
 
 export const deletePpt = asyncHandler(async (req, res) => {
-  const ppt = await Ppt.findById(req.params.id);
+  const ppt = await Ppt.findById(getValidatedObjectId(req.params.id, "ppt"));
   if (!ppt) return res.status(404).json({ message: "PPT not found" });
   await safeDestroy(ppt.file_public_id, "raw");
   await ppt.deleteOne();
@@ -387,7 +400,7 @@ export const listTestimonials = asyncHandler(async (req, res) => {
 });
 
 export const getTestimonial = asyncHandler(async (req, res) => {
-  const testimonial = await Testimonial.findById(req.params.id);
+  const testimonial = await Testimonial.findById(getValidatedObjectId(req.params.id, "testimonial"));
   if (!testimonial) return res.status(404).json({ message: "Testimonial not found" });
   res.status(200).json({ testimonial });
 });
@@ -407,7 +420,7 @@ export const createTestimonial = asyncHandler(async (req, res) => {
 });
 
 export const updateTestimonial = asyncHandler(async (req, res) => {
-  const testimonial = await Testimonial.findById(req.params.id);
+  const testimonial = await Testimonial.findById(getValidatedObjectId(req.params.id, "testimonial"));
   if (!testimonial) return res.status(404).json({ message: "Testimonial not found" });
   Object.assign(testimonial, req.body);
   if (req.file?.buffer) {
@@ -424,7 +437,7 @@ export const updateTestimonial = asyncHandler(async (req, res) => {
 });
 
 export const deleteTestimonial = asyncHandler(async (req, res) => {
-  const testimonial = await Testimonial.findById(req.params.id);
+  const testimonial = await Testimonial.findById(getValidatedObjectId(req.params.id, "testimonial"));
   if (!testimonial) return res.status(404).json({ message: "Testimonial not found" });
   await safeDestroy(testimonial.image_public_id, "image");
   await testimonial.deleteOne();
@@ -438,7 +451,7 @@ export const listIndexingLogos = asyncHandler(async (req, res) => {
 });
 
 export const getIndexingLogo = asyncHandler(async (req, res) => {
-  const indexingLogo = await IndexingLogo.findById(req.params.id);
+  const indexingLogo = await IndexingLogo.findById(getValidatedObjectId(req.params.id, "indexing logo"));
   if (!indexingLogo) return res.status(404).json({ message: "Indexing logo not found" });
   res.status(200).json({ indexingLogo });
 });
@@ -458,7 +471,7 @@ export const createIndexingLogo = asyncHandler(async (req, res) => {
 });
 
 export const updateIndexingLogo = asyncHandler(async (req, res) => {
-  const indexingLogo = await IndexingLogo.findById(req.params.id);
+  const indexingLogo = await IndexingLogo.findById(getValidatedObjectId(req.params.id, "indexing logo"));
   if (!indexingLogo) return res.status(404).json({ message: "Indexing logo not found" });
 
   Object.assign(indexingLogo, req.body);
@@ -477,7 +490,7 @@ export const updateIndexingLogo = asyncHandler(async (req, res) => {
 });
 
 export const deleteIndexingLogo = asyncHandler(async (req, res) => {
-  const indexingLogo = await IndexingLogo.findById(req.params.id);
+  const indexingLogo = await IndexingLogo.findById(getValidatedObjectId(req.params.id, "indexing logo"));
   if (!indexingLogo) return res.status(404).json({ message: "Indexing logo not found" });
   await safeDestroy(indexingLogo.image_public_id, "image");
   await indexingLogo.deleteOne();

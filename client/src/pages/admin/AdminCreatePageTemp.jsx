@@ -13,6 +13,7 @@ export const AdminCreatePageTemp = () => {
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
   const [devCode, setDevCode] = useState("");
+  const [twoFactorSetup, setTwoFactorSetup] = useState(null);
 
   const createAdmin = async (e) => {
     e.preventDefault();
@@ -31,6 +32,9 @@ export const AdminCreatePageTemp = () => {
       setInfo(data.message || "Admin created.");
       if (data.devVerificationCode) {
         setDevCode(`Dev verification code: ${data.devVerificationCode}`);
+      }
+      if (data.twoFactorSetup) {
+        setTwoFactorSetup(data.twoFactorSetup);
       }
       setStep("verify");
     } catch (err) {
@@ -112,6 +116,22 @@ export const AdminCreatePageTemp = () => {
           </form>
         ) : (
           <form onSubmit={verifyEmail} className="form-grid">
+            {twoFactorSetup ? (
+              <div className="info-block">
+                <h2>Authenticator Setup</h2>
+                <p>
+                  Scan the QR code with your authenticator app (Google Authenticator, Microsoft
+                  Authenticator, or Authy). You will use this code every time you log in.
+                </p>
+                <div className="qr-wrapper">
+                  <img src={twoFactorSetup.qrCodeDataUrl} alt="Authenticator QR code" />
+                </div>
+                <p>
+                  If you cannot scan the QR, open this link on your device:{" "}
+                  <a href={twoFactorSetup.otpauthUrl}>{twoFactorSetup.otpauthUrl}</a>
+                </p>
+              </div>
+            ) : null}
             <label>
               Gmail
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />

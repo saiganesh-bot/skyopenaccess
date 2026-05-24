@@ -226,7 +226,7 @@ export const SubmissionPage = () => {
     http
       .get("/journals")
       .then((res) => setJournals(res.data.journals || []))
-      .catch(console.error);
+      .catch(() => setJournals([]));
   }, []);
 
   const abstractWords = useMemo(() => {
@@ -258,23 +258,23 @@ export const SubmissionPage = () => {
     }
 
     if (!form.manuscript) {
-      setStatus({ type: "error", message: "Please upload manuscript file." });
+      setStatus({ type: "error", message: "Please upload your manuscript file." });
       return;
     }
 
-    const data = new FormData();
-    data.append("full_name", form.full_name);
-    data.append("email", form.email);
-    data.append("article_type", form.article_type);
-    data.append("manuscript_title", form.manuscript_title);
-    data.append("country", form.country);
-    data.append("abstract", form.abstract);
-    data.append("journal_ids", JSON.stringify(form.journal_ids));
-    data.append("manuscript", form.manuscript);
-
     try {
+      const data = new FormData();
+      data.append("full_name", form.full_name);
+      data.append("email", form.email);
+      data.append("article_type", form.article_type);
+      data.append("manuscript_title", form.manuscript_title);
+      data.append("country", form.country);
+      data.append("abstract", form.abstract);
+      data.append("journal_ids", JSON.stringify(form.journal_ids));
+      data.append("file", form.manuscript);
+
       const res = await http.post("/submissions", data);
-      setStatus({ type: "success", message: res.data.message || "Submission successful." });
+      setStatus({ type: "success", message: res.data?.message || "Submission received." });
       setForm({
         full_name: "",
         email: "",
@@ -285,104 +285,99 @@ export const SubmissionPage = () => {
         abstract: "",
         manuscript: null
       });
-    } catch (error) {
-      setStatus({
-        type: "error",
-        message: error.response?.data?.message || "Submission failed"
-      });
+    } catch (err) {
+      setStatus({ type: "error", message: err.response?.data?.message || "Submission failed." });
     }
   };
 
   return (
-    <main className="container">
-      <section className="form-card">
-        <h1>Online Manuscript Submission</h1>
-        <p>Submit your article with all required information and attach .doc/.docx/.pdf file.</p>
+    <main>
+      <section className="submission-section fade-up">
+        <img src="/images/store.jpg" className="submission-bg" alt="library" />
+        <div className="submission-overlay" />
 
-        <form onSubmit={submit} className="form-grid">
-          <label>
-            Full Name
-            <input name="full_name" value={form.full_name} onChange={update} required />
-          </label>
+        <div className="submission-left">
+          <h1>
+            Submit your
+            <br />
+            Manuscript
+          </h1>
+        </div>
 
-          <label>
-            Enter Mail
-            <input name="email" type="email" value={form.email} onChange={update} required />
-          </label>
+        <form className="submission-form" onSubmit={submit}>
+          <h2>Online Submission</h2>
 
-          <label>
-            Article Type
-            <select name="article_type" value={form.article_type} onChange={update} required>
+          <div className="submission-grid">
+            <input
+              name="full_name"
+              value={form.full_name}
+              onChange={update}
+              placeholder="Enter Your Name...."
+              required
+            />
+            <input
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={update}
+              placeholder="Enter Your Email...."
+              required
+            />
+            <select name="article_type" value={form.article_type} onChange={update}>
               {articleTypes.map((type) => (
                 <option key={type} value={type}>
                   {type}
                 </option>
               ))}
             </select>
-          </label>
-
-          <label>
-            Manuscript Title
             <input
               name="manuscript_title"
               value={form.manuscript_title}
               onChange={update}
+              placeholder="Manuscript Title...."
               required
             />
-          </label>
-
-          <label>
-            Journal(s)
-            <select multiple value={form.journal_ids} onChange={onJournalSelect} required>
+            <select multiple value={form.journal_ids} onChange={onJournalSelect}>
               {journals.map((journal) => (
                 <option key={journal._id} value={journal._id}>
                   {journal.title}
                 </option>
               ))}
             </select>
-          </label>
-
-          <label>
-            Country
             <select name="country" value={form.country} onChange={update} required>
-              <option value="">Select Country</option>
+              <option value="">Select Your Country</option>
               {countries.map((country) => (
                 <option key={country} value={country}>
                   {country}
                 </option>
               ))}
             </select>
-          </label>
+          </div>
 
-          <label className="full-width">
-            Abstract
-            <textarea
-              name="abstract"
-              rows={8}
-              value={form.abstract}
-              onChange={update}
-              placeholder="Write 150-300 words covering aim, methods, results and conclusions"
-              required
-            />
-            <small>{abstractWords} words</small>
-          </label>
+          <textarea
+            name="abstract"
+            value={form.abstract}
+            onChange={update}
+            placeholder="Abstract...."
+            required
+          />
 
-          <label className="full-width">
-            Main File (.doc/.docx/.pdf)
-            <input
-              type="file"
-              accept=".doc,.docx,.pdf,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-              onChange={onFileChange}
-              required
-            />
-          </label>
+          <div className="submission-upload">
+            <label className="submission-upload-btn" htmlFor="manuscript">
+              Upload PDF
+            </label>
+            <input id="manuscript" type="file" onChange={onFileChange} hidden />
+            <span>(Please Upload Only .Doc / .Pdf Files Only)</span>
+          </div>
 
-          <button type="submit" className="primary-btn full-width">
+          <button type="submit" className="submission-submit-btn">
             Submit
           </button>
-        </form>
 
-        {status.message ? <p className={status.type}>{status.message}</p> : null}
+          {status.message ? (
+            <p className={status.type === "error" ? "error" : "success"}>{status.message}</p>
+          ) : null}
+        </form>
       </section>
     </main>
   );
