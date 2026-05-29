@@ -20,8 +20,11 @@ export const manuscriptUpload = multer({
   storage,
   limits: { fileSize: 25 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    if (!manuscriptTypes.includes(file.mimetype)) {
-      return cb(new Error("Only .doc, .docx and .pdf files are allowed"));
+    // Only validate manuscript files, allow other fields
+    if (file.fieldname === "manuscript") {
+      if (!manuscriptTypes.includes(file.mimetype)) {
+        return cb(new Error("Only .doc, .docx and .pdf files are allowed"));
+      }
     }
     cb(null, true);
   }

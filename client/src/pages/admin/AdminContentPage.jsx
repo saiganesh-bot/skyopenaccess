@@ -334,8 +334,19 @@ export const AdminContentPage = ({
   };
 
   const remove = async (path, id) => {
-    await http.delete(`/content/${path}/${id}`);
-    await load();
+    const itemName = path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, ' ');
+    const confirmed = window.confirm(`Are you sure you want to delete this ${itemName}? This action cannot be undone.`);
+    if (!confirmed) return;
+    
+    try {
+      setError("");
+      setInfo("");
+      await http.delete(`/content/${path}/${id}`);
+      await load();
+      setInfo(`${itemName} deleted successfully.`);
+    } catch (err) {
+      setError(err.response?.data?.message || `Failed to delete ${itemName}`);
+    }
   };
 
   return (

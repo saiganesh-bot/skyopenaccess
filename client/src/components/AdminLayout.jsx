@@ -21,13 +21,7 @@ export const AdminLayout = () => {
     <div className="admin-layout">
       <aside className="admin-sidebar">
         <div className="admin-brand">
-          <div className="admin-mark">
-            <span className="admin-mark-dot" />
-          </div>
-          <div>
-            <p>Open Ethics</p>
-            <p>Publisher</p>
-          </div>
+         <img src="/images/sky-logo-final.png" alt="Open Ethics Publisher"  className="admin-logo"/>
         </div>
         <nav className="admin-menu">
           {navItems.map((item) => (

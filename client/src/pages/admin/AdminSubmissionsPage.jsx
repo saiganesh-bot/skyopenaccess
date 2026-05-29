@@ -78,7 +78,7 @@ export const AdminSubmissionsPage = () => {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    Download
+                    View PDF
                   </a>
                 ) : (
                   <span>-</span>

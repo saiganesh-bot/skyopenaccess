@@ -50,8 +50,18 @@ export const AdminDashboardPage = () => {
   };
 
   const deleteJournal = async (id) => {
-    await http.delete(`/journals/${id}`);
-    await loadData();
+    const confirmed = window.confirm("Are you sure you want to delete this journal? This action cannot be undone.");
+    if (!confirmed) return;
+    
+    try {
+      setError("");
+      setInfo("");
+      await http.delete(`/journals/${id}`);
+      await loadData();
+      setInfo("Journal deleted successfully.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to delete journal");
+    }
   };
 
   const filteredJournals = journals.filter((journal) =>

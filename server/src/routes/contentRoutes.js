@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createArchiveVolume,
   createArticle,
+  createArticleInPress,
   createBoardMember,
   createCurrentIssue,
   createIndexingLogo,
@@ -10,6 +11,7 @@ import {
   createVideo,
   deleteArchiveVolume,
   deleteArticle,
+  deleteArticleInPress,
   deleteBoardMember,
   deleteCurrentIssue,
   deleteIndexingLogo,
@@ -26,6 +28,7 @@ import {
   getVideo,
   listArchiveVolumes,
   listArticles,
+  listArticlesInPress,
   listBoardMembers,
   listCurrentIssues,
   listIndexingLogos,
@@ -51,6 +54,10 @@ router.get("/articles/:id", getArticle);
 router.post("/articles", protect, adminOnly, documentUpload.single("file"), createArticle);
 router.put("/articles/:id", protect, adminOnly, documentUpload.single("file"), updateArticle);
 router.delete("/articles/:id", protect, adminOnly, deleteArticle);
+
+router.get("/articles-in-press", listArticlesInPress);
+router.post("/articles-in-press", protect, adminOnly, createArticleInPress);
+router.delete("/articles-in-press/:id", protect, adminOnly, deleteArticleInPress);
 
 router.get("/board-members", listBoardMembers);
 router.get("/board-members/:id", getBoardMember);

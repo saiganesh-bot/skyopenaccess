@@ -1,21 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, Link } from "react-router-dom";
 import { http } from "../../api/http";
 import { toDriveViewerUrl } from "../../utils/driveViewer";
 
 const cleanText = (html = "") => html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 
 const tabs = [
-  { id: "about", label: "About" },
-  { id: "aim", label: "Aim & Scope" },
-  { id: "guidelines", label: "Author Guidelines" },
-  { id: "editorial", label: "Editorial Board" },
-  { id: "press", label: "Article In Press" },
-  { id: "current", label: "Current Issue" },
-  { id: "archive", label: "Archive" },
-  { id: "ppts", label: "Ppts" },
-  { id: "videos", label: "Videos" },
-  { id: "indexing", label: "Indexing" }
+  { id: "about", label: "About", icon: "fa-solid fa-info-circle" },
+  { id: "aim", label: "Aim & Scope", icon: "fa-solid fa-bullseye" },
+  { id: "guidelines", label: "Author Guidelines", icon: "fa-solid fa-pen-fancy" },
+  { id: "editorial", label: "Editorial Board", icon: "fa-solid fa-users" },
+  { id: "press", label: "Article In Press", icon: "fa-solid fa-file-lines" },
+  { id: "current", label: "Current Issue", icon: "fa-solid fa-newspaper" },
+  { id: "archive", label: "Archive", icon: "fa-solid fa-archive" },
+  { id: "ppts", label: "PPTs", icon: "fa-solid fa-file-powerpoint" },
+  { id: "videos", label: "Videos", icon: "fa-solid fa-video" },
+  { id: "indexing", label: "Indexing", icon: "fa-solid fa-award" }
+  
 ];
 
 export const JournalDetailPage = () => {
@@ -88,7 +89,9 @@ export const JournalDetailPage = () => {
   if (loading) {
     return (
       <main className="container">
-        <p>Loading journal content...</p>
+        <div className="loading-spinner">
+          <p>Loading journal content...</p>
+        </div>
       </main>
     );
   }
@@ -96,190 +99,340 @@ export const JournalDetailPage = () => {
   if (!journal) {
     return (
       <main className="container">
-        <p>{error || "Journal not found"}</p>
+        <p className="error-message">{error || "Journal not found"}</p>
       </main>
     );
   }
 
   return (
-    <main>
-      <div className="container">
-        <aside className="sidebar">
-          <ul>
-            {tabs.map((tab) => (
-              <li
-                key={tab.id}
-                className={tab.id === activeTab ? "active" : ""}
-                onClick={() => setActiveTab(tab.id)}
-              >
-                {tab.label}
-              </li>
-            ))}
-          </ul>
-        </aside>
-
-        <main className="content">
-          <div className={`tab-content ${activeTab === "about" ? "active" : ""}`} id="about">
-            <div className="about-header">
-              <h1>{journal.title}</h1>
-              <p>{articleCount} published entries and media assets available.</p>
+    <main className="journal-detail-page">
+        <div className="journal-layout">
+          {/* SIDEBAR */}
+          <aside className="journal-sidebar">
+            {/* Journal Cover and Name */}
+            <div className="sidebar-journal-header">
+              <h2 className="sidebar-journal-name">{journal.title}</h2>
             </div>
-            <div className="about-body">
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: journal.about || "<p>Not available yet.</p>"
-                }}
-              />
+            <nav className="tab-navigation">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  className={`nav-btn ${activeTab === tab.id ? "active" : ""}`}
+                  onClick={() => setActiveTab(tab.id)}
+                  type="button"
+                >
+                  <i className={tab.icon}></i>
+                  <span>{tab.label}</span>
+                  <i className="fa-solid fa-chevron-right"></i>
+                </button>
+              ))}
+            </nav>
+          </aside>
+
+          {/* MAIN CONTENT */}
+          <main className="journal-content">
+            {/* ABOUT TAB */}
+            <div className={`tab-content ${activeTab === "about" ? "active" : ""}`} id="about">
+              <div className="content-header">
+                <div className="header-top">
+                  <h1 className="journal-title">{journal.title}</h1>
+                  {journal.issn && <div className="issn-badge">ISSN: {journal.issn}</div>}
+                </div>
+                {journal.subtitle && <p className="journal-subtitle">{journal.subtitle}</p>}
+              </div>
+              <div className="content-body">
+                {/* Main About Section */}
+                <section className="about-section">
+                  <h2>About This Journal</h2>
+                  <div className="about-text" dangerouslySetInnerHTML={{ __html: journal.about || "<p>Not available yet.</p>" }} />
+                </section>
+
+              </div>
             </div>
-          </div>
 
-          <div className={`tab-content ${activeTab === "aim" ? "active" : ""}`} id="aim">
-            <div className="section-header">
-              <h1>Aim &amp; Scope</h1>
+            {/* AIM & SCOPE TAB */}
+            <div className={`tab-content ${activeTab === "aim" ? "active" : ""}`} id="aim">
+              <div className="content-header">
+                <h1>Aim & Scope</h1>
+              </div>
+              <div className="content-body">
+                <div className="about-text" dangerouslySetInnerHTML={{ __html: journal.aim_scope || "<p>Not available yet.</p>" }} />
+              </div>
             </div>
-            <div className="about-body">
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: journal.aim_scope || "<p>Not available yet.</p>"
-                }}
-              />
+
+            {/* AUTHOR GUIDELNES TAB */}
+            <div className={`tab-content ${activeTab === "guidelines" ? "active" : ""}`} id="guidelines">
+              <div className="content-header">
+                <h1>Author Guidelines</h1>
+              </div>
+              <div className="content-body">
+                <div className="about-text" dangerouslySetInnerHTML={{ __html: journal.author_guidelines || "<p>Not available yet.</p>" }} />
+              </div>
             </div>
-          </div>
 
-          <div
-            className={`tab-content ${activeTab === "guidelines" ? "active" : ""}`}
-            id="guidelines"
-          >
-            <h1>Author Guidelines</h1>
-            <div
-              className="about-body"
-              dangerouslySetInnerHTML={{
-                __html: journal.author_guidelines || "<p>Not available yet.</p>"
-              }}
-            />
-          </div>
+            {/* EDITORIAL BOARD TAB */}
+            <div className={`tab-content ${activeTab === "editorial" ? "active" : ""}`} id="editorial">
+              <div className="content-header">
+                <h1>Editorial Board</h1>
+              </div>
+              <div className="content-body">
+                {content.members.length ? (
+                  <div className="editorial-grid">
+                    {content.members.map((member) => (
+                      <div key={member._id} className="editor-card">
+                        <div className="editor-image">
+                          {member.image_url ? (
+                            <img src={member.image_url} alt={member.name} />
+                          ) : (
+                            <div className="editor-placeholder">
+                              <i className="fa-solid fa-user"></i>
+                            </div>
+                          )}
+                        </div>
+                        <h3>{member.name}</h3>
+                        <p>{member.description || "Profile coming soon."}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="no-content-msg">No editorial board members yet.</p>
+                )}
+              </div>
+            </div>
 
-          <div
-            className={`tab-content ${activeTab === "editorial" ? "active" : ""}`}
-            id="editorial"
-          >
-            <h1>Editorial Board</h1>
-            {content.members.length ? (
-              <ul className="styled-list">
-                {content.members.map((member) => (
-                  <li key={member._id}>
-                    <strong>{member.name}</strong> — {member.description || "Profile coming soon."}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No editorial board members yet.</p>
-            )}
-          </div>
+            {/* ARTICLES IN PRESS TAB */}
+            <div className={`tab-content ${activeTab === "press" ? "active" : ""}`} id="press">
+              <div className="content-header">
+                <h1>Articles In Press</h1>
+              </div>
+              <div className="content-body">
+                {content.articles.length ? (
+                  <div className="articles-list">
+                    {content.articles.map((article) => (
+                      <article key={article._id} className="article-item">
+                        <p className="article-type">{article.type}</p>
+                        <h3>{article.title}</h3>
+                        <p className="article-authors">Authors: {article.authors}</p>
+                        
+                        <div className="article-actions">
+                          <Link to={`/article/${article._id}`} className="read-btn">
+                            <i className="fa-solid fa-arrow-right"></i> Read More
+                          </Link>
+                          {article.pdf_url && (
+                            <a href={toDriveViewerUrl(article.pdf_url)} target="_blank" rel="noreferrer" className="read-btn secondary">
+                              <i className="fa-solid fa-file-pdf"></i> PDF
+                            </a>
+                          )}
+                          {article.doi_link && (
+                            // <a href={article.doi_link} target="_blank" rel="noreferrer" className="read-btn secondary">
+                            //   <i className="fa-solid fa-book"></i> DOI
+                            // </a>
+                            <p className="article-doi">DOI: <a href={article.doi_link} target="_blank" rel="noreferrer">{article.doi_link}</a></p>
+                          )}
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="no-content-msg">No articles in press yet.</p>
+                )}
+              </div>
+            </div>
 
-          <div className={`tab-content ${activeTab === "press" ? "active" : ""}`} id="press">
-            <h1>Article In Press</h1>
-            {content.articles.length ? (
-              <ul className="styled-list">
-                {content.articles.map((article) => (
-                  <li key={article._id}>
-                    <strong>{article.title}</strong>
-                    <span> — {cleanText(article.abstract).slice(0, 140)}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No articles in press yet.</p>
-            )}
-          </div>
+            {/* CURRENT ISSUE TAB */}
+            <div className={`tab-content ${activeTab === "current" ? "active" : ""}`} id="current">
+              <div className="content-header">
+                <h1>Current Issue</h1>
+              </div>
+              <div className="content-body">
+                {content.issues.length ? (
+                  <div className="current-issues-container">
+                    {content.issues.map((issue) => (
+                      <div key={issue._id} className="current-issue-block">
+                        {issue.volume_items?.length ? (
+                          <div className="issue-volumes">
+                            {issue.volume_items.map((volume) => (
+                              <div key={volume._id} className="issue-volume-block">
+                                <div className="issue-volume-heading">
+                                  <span>{volume.year}</span>
+                                  <h3>{volume.volume_title}</h3>
+                                </div>
+                                {volume.article_items?.length ? (
+                                  <div className="issue-articles">
+                                    {volume.article_items.map((article) => (
+                                      <div key={article._id} className="issue-article-row">
+                                        <div className="article-info">
+                                          <p className="article-row-type">{article.type}</p>
+                                          <p className="article-row-title">{article.title}</p>
+                                          <p className="article-row-authors">{article.authors}</p>
+                                          {article.pdf_url && (
+                                            <a href={toDriveViewerUrl(article.pdf_url)} target="_blank" rel="noreferrer" className="action-link" title="View PDF">
+                                              <i className="fa-solid fa-file-pdf"></i> PDF
+                                            </a>
+                                          )}
+                                        </div>
+                                        <div className="article-row-actions">
+                                          
+                                          {article.doi_link && <p className="article-row-doi">DOI: <a href={article.doi_link} target="_blank" rel="noreferrer">{article.doi_link}</a></p>}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <p className="no-articles-msg">No articles in this volume.</p>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ) : issue.article_items?.length ? (
+                          <div className="issue-articles">
+                            {issue.article_items.map((article) => (
+                              <div key={article._id} className="issue-article-row">
+                                <div className="article-info">
+                                  <p className="article-row-type">{article.type}</p>
+                                  <p className="article-row-title">{article.title}</p>
+                                  <p className="article-row-authors">{article.authors}</p>
+                                  {article.doi_link && <p className="article-row-doi">DOI: {article.doi_link}</p>}
+                                </div>
+                                <div className="article-row-actions">
+                                  {article.pdf_url && (
+                                    <a href={toDriveViewerUrl(article.pdf_url)} target="_blank" rel="noreferrer" className="action-link" title="View PDF">
+                                      <i className="fa-solid fa-file-pdf"></i> PDF
+                                    </a>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="no-articles-msg">No articles in this issue.</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="no-content-msg">No current issues published yet.</p>
+                )}
+              </div>
+            </div>
 
-          <div className={`tab-content ${activeTab === "current" ? "active" : ""}`} id="current">
-            <h1>Current Issue</h1>
-            {content.issues.length ? (
-              <ul className="styled-list">
-                {content.issues.map((issue) => (
-                  <li key={issue._id}>
-                    <strong>{issue.volume_title}</strong> — {issue.article_items?.length || 0} linked
-                    articles
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No current issues published yet.</p>
-            )}
-          </div>
+            {/* ARCHIVE TAB */}
+            <div className={`tab-content ${activeTab === "archive" ? "active" : ""}`} id="archive">
+              <div className="content-header">
+                <h1>Archive</h1>
+              </div>
+              <div className="content-body">
+                {content.volumes.length ? (
+                  <div className="archive-container">
+                    {Object.entries(
+                      content.volumes.reduce((acc, volume) => {
+                        if (!acc[volume.year]) acc[volume.year] = [];
+                        acc[volume.year].push(volume);
+                        return acc;
+                      }, {})
+                    )
+                      .sort(([yearA], [yearB]) => yearB - yearA)
+                      .map(([year, volumes]) => (
+                        <div key={year} className="archive-year-section">
+                          <div className="year-header">{year}</div>
+                          <div className="volumes-list">
+                            {volumes.map((volume) => (
+                              <Link
+                                key={volume._id}
+                                to={`/journals/${slug}/archive/${volume._id}`}
+                                className="volume-item volume-link"
+                              >
+                                <h4>{volume.volume_title}</h4>
+                                <p className="volume-articles">{volume.article_items?.length || 0} articles</p>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                ) : (
+                  <p className="no-content-msg">No archive volume yet.</p>
+                )}
+              </div>
+            </div>
 
-          <div className={`tab-content ${activeTab === "archive" ? "active" : ""}`} id="archive">
-            <h1>Archive</h1>
-            {content.volumes.length ? (
-              <ul className="styled-list">
-                {content.volumes.map((volume) => (
-                  <li key={volume._id}>
-                    <strong>
-                      {volume.year} — {volume.volume_title}
-                    </strong>
-                    <span> — {volume.article_items?.length || 0} linked articles</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No archive volume yet.</p>
-            )}
-          </div>
+            {/* PPTS TAB */}
+            <div className={`tab-content ${activeTab === "ppts" ? "active" : ""}`} id="ppts">
+              <div className="content-header">
+                <h1>Presentations</h1>
+              </div>
+              <div className="content-body">
+                {content.ppts.length ? (
+                  <div className="resources-list">
+                    {content.ppts.map((ppt) => (
+                      <a
+                        key={ppt._id}
+                        href={toDriveViewerUrl(ppt.file_url)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="resource-item"
+                      >
+                        <i className="fa-solid fa-file-powerpoint"></i>
+                        <span>{ppt.title}</span>
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="no-content-msg">No PPTs available yet.</p>
+                )}
+              </div>
+            </div>
 
-          <div className={`tab-content ${activeTab === "ppts" ? "active" : ""}`} id="ppts">
-            <h1>Ppts</h1>
-            {content.ppts.length ? (
-              <ul className="styled-list">
-                {content.ppts.map((ppt) => (
-                  <li key={ppt._id}>
-                    <a href={toDriveViewerUrl(ppt.file_url)} target="_blank" rel="noreferrer">
-                      {ppt.title}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No PPTs available yet.</p>
-            )}
-          </div>
+            {/* VIDEOS TAB */}
+            <div className={`tab-content ${activeTab === "videos" ? "active" : ""}`} id="videos">
+              <div className="content-header">
+                <h1>Videos</h1>
+              </div>
+              <div className="content-body">
+                {content.videos.length ? (
+                  <div className="videos-grid">
+                    {content.videos.map((video) => (
+                      <a
+                        key={video._id}
+                        href={video.youtube_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="video-card"
+                      >
+                        <div className="video-icon">
+                          <i className="fa-brands fa-youtube"></i>
+                        </div>
+                        <h4>{video.title}</h4>
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="no-content-msg">No videos available yet.</p>
+                )}
+              </div>
+            </div>
 
-          <div className={`tab-content ${activeTab === "videos" ? "active" : ""}`} id="videos">
-            <h1>Videos</h1>
-            {content.videos.length ? (
-              <ul className="styled-list">
-                {content.videos.map((video) => (
-                  <li key={video._id}>
-                    <a href={video.youtube_url} target="_blank" rel="noreferrer">
-                      {video.title}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No videos available yet.</p>
-            )}
-          </div>
-
-          <div
-            className={`tab-content ${activeTab === "indexing" ? "active" : ""}`}
-            id="indexing"
-          >
-            <h1>Indexing</h1>
-            {content.indexingLogos.length ? (
-              <ul className="styled-list">
-                {content.indexingLogos.map((logo) => (
-                  <li key={logo._id}>
-                    <img src={logo.image_url} alt={logo.name} width="48" /> {logo.name}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No indexing logos yet.</p>
-            )}
-          </div>
-        </main>
-      </div>
+            {/* INDEXING TAB */}
+            <div className={`tab-content ${activeTab === "indexing" ? "active" : ""}`} id="indexing">
+              <div className="content-header">
+                <h1>Indexing</h1>
+              </div>
+              <div className="content-body">
+                {content.indexingLogos.length ? (
+                  <div className="indexing-grid">
+                    {content.indexingLogos.map((logo) => (
+                      <div key={logo._id} className="indexing-item">
+                        <img src={logo.image_url} alt={logo.name} />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="no-content-msg">No indexing logos yet.</p>
+                )}
+              </div>
+            </div>
+          </main>
+        </div>
     </main>
   );
 };

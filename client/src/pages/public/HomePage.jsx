@@ -1,49 +1,121 @@
+// {import { useEffect, useMemo, useRef, useState } from "react";
+// import { NavLink, useSearchParams } from "react-router-dom";
+// import { http } from "../../api/http";
+
+// export const HomePage = () => {
+//   const [testimonials, setTestimonials] = useState([]);
+//   const [journals, setJournals] = useState([]);
+//   const [searchParams] = useSearchParams();
+//   const testimonialsRef = useRef(null);
+//   const autoScrollIntervalRef = useRef(null);
+
+//   const query = (searchParams.get("q") || "").trim().toLowerCase();
+  
+//   useEffect(() => {
+//     http
+//       .get("/content/testimonials")
+//       .then((res) => setTestimonials(res.data.testimonials || []))
+//       .catch(() => setTestimonials([]));
+//   }, []);
+//   const duplicatedTestimonials =testimonials.length > 0? [...testimonials, ...testimonials]: [];
+//   // Auto-scroll testimonials every 8 seconds
+//   useEffect(() => {
+//     if (testimonials.length <= 1) return;
+
+//     const startAutoScroll = () => {
+//       autoScrollIntervalRef.current = setInterval(() => {
+//         scrollTestimonials(1);
+//       }, 2000); 
+//     };
+
+//     startAutoScroll();
+
+//     return () => {
+//       if (autoScrollIntervalRef.current) {
+//         clearInterval(autoScrollIntervalRef.current);
+//       }
+//     };
+//   }, [testimonials.length]);
+
+//   const previewText = (value) => {
+//     if (!value) return "";
+//     return value.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 200);
+//   };
+
+//   const scrollTestimonials = (direction) => {
+//     if (!testimonialsRef.current) return;
+//     const card = testimonialsRef.current.querySelector(".testimonial-card");
+//     const offset = card ? card.offsetWidth + 24 : 320;
+//     testimonialsRef.current.scrollBy({ left: direction * offset, behavior: "smooth" });
+//   };
+// };
+
+
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { NavLink, useSearchParams } from "react-router-dom";
 import { http } from "../../api/http";
 
 export const HomePage = () => {
   const [testimonials, setTestimonials] = useState([]);
-  const [journals, setJournals] = useState([]);
-  const [searchParams] = useSearchParams();
-  const testimonialsRef = useRef(null);
+const [searchParams] = useSearchParams();
 
-  const query = (searchParams.get("q") || "").trim().toLowerCase();
+const testimonialsRef = useRef(null);
 
-  useEffect(() => {
-    http
-      .get("/content/testimonials")
-      .then((res) => setTestimonials(res.data.testimonials || []))
-      .catch(() => setTestimonials([]));
-  }, []);
+const query = (
+  searchParams.get("q") || ""
+)
+  .trim()
+  .toLowerCase();
 
-  useEffect(() => {
-    http
-      .get("/journals")
-      .then((res) => setJournals(res.data.journals || []))
-      .catch(() => setJournals([]));
-  }, []);
+// Fetch testimonials
+useEffect(() => {
+  http
+    .get("/content/testimonials")
+    .then((res) =>
+      setTestimonials(
+        res.data.testimonials || []
+      )
+    )
+    .catch(() => setTestimonials([]));
+}, []);
 
-  const filteredJournals = useMemo(() => {
-    if (!query) return journals;
-    return journals.filter((journal) => {
-      const title = journal.title || "";
-      const about = journal.about || "";
-      return `${title} ${about}`.toLowerCase().includes(query);
-    });
-  }, [journals, query]);
+// Scroll buttons
+const scrollTestimonials = (direction) => {
+  const container =
+    testimonialsRef.current;
 
-  const previewText = (value) => {
-    if (!value) return "";
-    return value.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 200);
-  };
+  if (!container) return;
 
-  const scrollTestimonials = (direction) => {
-    if (!testimonialsRef.current) return;
-    const card = testimonialsRef.current.querySelector(".testimonial-card");
-    const offset = card ? card.offsetWidth + 24 : 320;
-    testimonialsRef.current.scrollBy({ left: direction * offset, behavior: "smooth" });
-  };
+  const card =
+    container.querySelector(
+      ".testimonial-card"
+    );
+
+  const offset = card
+    ? card.offsetWidth + 24
+    : 320;
+
+  container.scrollBy({
+    left: direction * offset,
+    behavior: "smooth",
+  });
+};
+
+// Text preview helper
+const previewText = (value) => {
+  if (!value) return "";
+
+  return value
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 200);
+};
+
+
+
+
 
   return (
     <main>
@@ -120,9 +192,6 @@ export const HomePage = () => {
               </div>
             </div>
 
-            <div className="book-base">
-              <img src="/images/book-base.png" alt="" />
-            </div>
           </div>
         </div>
       </section>
@@ -202,6 +271,57 @@ export const HomePage = () => {
         </div>
       </div>
 
+      {/* Journals Section */}
+      {/* {!query && journals.length > 0 ? (
+        <section className="journals-section fade-up">
+          <div className="container">
+            <div className="section-header">
+              <h2 className="section-title">Our Journals</h2>
+              <p className="section-description">
+                Explore our collection of peer-reviewed journals across various scientific disciplines
+              </p>
+            </div>
+
+            <div className="journals-grid">
+              {journals.slice(0, 3).map((journal) => (
+                <article className="journal-card fade-up" key={journal._id}>
+                  <div className="journal-card-image">
+                    {journal.cover_image_url ? (
+                      <img src={journal.cover_image_url} alt={journal.title} />
+                    ) : (
+                      <div className="journal-card-placeholder">
+                        <i className="fa-solid fa-book-open" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="journal-card-content">
+                    <h3>{journal.title}</h3>
+                    <p className="journal-description">{previewText(journal.about) || "A leading peer-reviewed journal dedicated to advancing scientific knowledge."}</p>
+                    <div className="journal-card-actions">
+                      <NavLink to={`/journals/${journal.slug}`} className="journal-btn">
+                        View Journal
+                      </NavLink>
+                      <NavLink to={`/journals/${journal.slug}#current`} className="journal-btn secondary">
+                        Current Issue
+                      </NavLink>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            {journals.length > 3 ? (
+              <div className="view-all-journals">
+                <NavLink to="/journals" className="view-all-btn">
+                  View All Journals
+                  <i className="fa-solid fa-arrow-right" />
+                </NavLink>
+              </div>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
+
       {query ? (
         <section className="home-search-results fade-up" id="home-journals">
           <div className="container">
@@ -231,7 +351,7 @@ export const HomePage = () => {
             ) : null}
           </div>
         </section>
-      ) : null}
+      ) : null} */}
 
       <section className="book-banner fade-up">
         <div className="book-banner-overlay">
@@ -249,71 +369,110 @@ export const HomePage = () => {
         </div>
       </section>
 
-      <section className="testimonial-section fade-up">
-        <div className="container">
-          <div className="left-content fade-up">
-            <span className="tag">Testimonials</span>
-            <h2>What Our Client Says</h2>
-            <p>
-              Medical, Pharmaceutical, Biomedical, Life Sciences, Engineering, And Environmental
-              Sciences.
-            </p>
-          </div>
+     <section className="testimonial-section fade-up">
+    <div className="left-content fade-up">
+      <span className="tag">
+        Testimonials
+      </span>
 
-          <div className="testimonial-shell">
-            {testimonials.length > 1 ? (
-              <button
-                type="button"
-                className="arrow left-arrow"
-                onClick={() => scrollTestimonials(-1)}
-                aria-label="Previous testimonial"
-              >
-                ←
-              </button>
-            ) : null}
+      <h2>
+        What Our Client Says
+      </h2>
 
-            <div className="testimonial-track" ref={testimonialsRef}>
-              {testimonials.length ? (
-                testimonials.map((item) => (
-                  <article className="testimonial-card fade-up" key={item._id}>
-                    <div className="quote-icon">“</div>
-                    <p className="testimonial-text">{item.description}</p>
-                    <div className="divider" />
-                    <div className="client-info">
-                      <img
-                        src={item.image_url || "https://randomuser.me/api/portraits/men/32.jpg"}
-                        alt={item.name || "Client"}
-                      />
-                      <div>
-                        <h4>{item.name || "Client"}</h4>
-                        <span>Contributor</span>
-                      </div>
-                    </div>
-                  </article>
-                ))
-              ) : (
-                <article className="testimonial-card fade-up">
-                  <div className="quote-icon">“</div>
-                  <p className="testimonial-text">
-                    No testimonials available yet. Please check back soon.
-                  </p>
-                </article>
-              )}
+      <p>
+        Medical, Pharmaceutical,
+        Biomedical, Life Sciences,
+        Engineering, And Environmental
+        Sciences.
+      </p>
+    </div>
+    {testimonials.length > 1 && (
+        <button
+          className="testimonial-arrow left"
+          onClick={() =>
+            scrollTestimonials(-1)
+          }
+        >
+          ←
+        </button>
+      )}
+
+    <div className="testimonial-shell">
+      
+
+      <div
+        className="testimonial-track"
+        ref={testimonialsRef}
+      >
+        {testimonials.length ? (
+          testimonials.map((item) => (
+            <article
+              className="testimonial-card fade-up"
+              key={item._id}
+            >
+              <div className="quote-icon">
+                “
+              </div>
+
+              <p className="testimonial-text">
+                {previewText(
+                  item.description
+                )}
+              </p>
+
+              <div className="divider" />
+
+              <div className="client-info">
+                <img
+                  src={
+                    item.image_url ||
+                    "https://randomuser.me/api/portraits/men/32.jpg"
+                  }
+                  alt={
+                    item.name || "Client"
+                  }
+                />
+
+                <div>
+                  <h4>
+                    {item.name ||
+                      "Client"}
+                  </h4>
+
+                  <span>
+                    Contributor
+                  </span>
+                </div>
+              </div>
+            </article>
+          ))
+        ) : (
+          <article className="testimonial-card">
+            <div className="quote-icon">
+              “
             </div>
 
-            {testimonials.length > 1 ? (
-              <button
-                type="button"
-                className="arrow right-arrow"
-                onClick={() => scrollTestimonials(1)}
-                aria-label="Next testimonial"
-              >
-                →
-              </button>
-            ) : null}
-          </div>
-        </div>
-      </section>
+            <p className="testimonial-text">
+              No testimonials available
+              yet.
+            </p>
+          </article>
+        )}
+      </div>
+
+      
+    </div>
+    {testimonials.length > 1 && (
+        <button
+          className="testimonial-arrow right"
+          onClick={() =>
+            scrollTestimonials(1)
+          }
+        >
+          →
+        </button>
+      )}
+</section>
     </main>
   );
 };

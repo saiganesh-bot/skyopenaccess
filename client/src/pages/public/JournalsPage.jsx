@@ -24,6 +24,27 @@ export const JournalsPage = () => {
       return `${title} ${about}`.toLowerCase().includes(query);
     });
   }, [journals, query]);
+  const truncateToWords = (text, wordLimit) => {
+  if (!text) return "";
+  
+  // Check if text contains HTML
+  const hasHTML = /<[^>]+>/.test(text);
+  
+  if (hasHTML) {
+    // For HTML content, extract plain text, count words, then reconstruct
+    const plainText = text.replace(/<[^>]+>/g, " ");
+    const words = plainText.trim().split(/\s+/);
+    if (words.length <= wordLimit) return text;
+    
+    // Create truncated plain text version
+    return words.slice(0, wordLimit).join(" ");
+  } else {
+    // For plain text
+    const words = text.trim().split(/\s+/);
+    if (words.length <= wordLimit) return text;
+    return words.slice(0, wordLimit).join(" ");
+  }
+};
 
   return (
     <main>
@@ -42,9 +63,12 @@ export const JournalsPage = () => {
                 )}
               </div>
 
-              <div className="journal-content">
+              <div className="journal-content-primary">
                 <h3>{journal.title}</h3>
-                <p>{cleanText(journal.about) || "No description provided yet."}</p>
+                <p>{truncateToWords(journal.about || "No description provided yet.", 60)}</p>
+                <a href={`/journals/${journal.slug}`}>
+                  Read More...
+                </a>
 
                 <div className="journal-buttons">
                   <NavLink to={`/journals/${journal.slug}`} className="btn">

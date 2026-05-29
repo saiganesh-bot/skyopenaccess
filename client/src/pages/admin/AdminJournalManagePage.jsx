@@ -6,8 +6,6 @@ import { http } from "../../api/http";
 
 const tabs = [
   { key: "details", label: "Details" },
-  { key: "info-box", label: "Info Box" },
-  { key: "recent-articles", label: "Recent Articles" },
   { key: "editorial-board", label: "Editorial Board" },
   { key: "articles-in-press", label: "Articles In Press" },
   { key: "current-issue", label: "Current Issue" },
@@ -48,8 +46,8 @@ export const AdminJournalManagePage = () => {
       file: null
     },
     boardMember: { name: "", description: "", image: null },
-    currentIssue: { volume_title: "", article_ids: "" },
-    archiveVolume: { year: "", volume_title: "", article_ids: "" },
+    currentIssue: { volume_title: "", archive_volume_ids: [] },
+    archiveVolume: { year: "", volume_title: "", article_ids: [] },
     video: { title: "", youtube_url: "" },
     ppt: { title: "", file: null },
     indexingLogo: { name: "", image: null }
@@ -204,9 +202,10 @@ export const AdminJournalManagePage = () => {
     await http.post("/content/current-issues", {
       journal_id: journalId,
       volume_title: forms.currentIssue.volume_title,
-      article_ids: jsonList(forms.currentIssue.article_ids)
+      archive_volume_ids: forms.currentIssue.archive_volume_ids
     });
     await load();
+    setForm("currentIssue", { volume_title: "", archive_volume_ids: [] });
   };
 
   const updateCurrentIssue = async (item) => {
@@ -222,9 +221,10 @@ export const AdminJournalManagePage = () => {
       journal_id: journalId,
       year: Number(forms.archiveVolume.year),
       volume_title: forms.archiveVolume.volume_title,
-      article_ids: jsonList(forms.archiveVolume.article_ids)
+      article_ids: forms.archiveVolume.article_ids
     });
     await load();
+    setForm("archiveVolume", { year: "", volume_title: "", article_ids: [] });
   };
 
   const updateArchiveVolume = async (item) => {
@@ -358,43 +358,6 @@ export const AdminJournalManagePage = () => {
         </section>
       ) : null}
 
-      {activeTab === "info-box" ? (
-        <section className="form-card admin-panel">
-          <h3>Info Box</h3>
-          <p className="muted-line">Info box management will be available here.</p>
-        </section>
-      ) : null}
-
-      {activeTab === "recent-articles" ? (
-        <section className="form-card admin-panel">
-          <div className="panel-header">
-            <div>
-              <h3>Recent Articles</h3>
-              <p className="muted-line">Add and update recent articles for this journal.</p>
-            </div>
-          </div>
-          <form className="form-grid" onSubmit={createArticle}>
-            <input placeholder="Type" value={forms.article.type} onChange={(e) => setForm("article", { type: e.target.value })} />
-            <input placeholder="Title" value={forms.article.title} onChange={(e) => setForm("article", { title: e.target.value })} required />
-            <input placeholder="Authors" value={forms.article.authors} onChange={(e) => setForm("article", { authors: e.target.value })} required />
-            <textarea placeholder="Abstract" value={forms.article.abstract} onChange={(e) => setForm("article", { abstract: e.target.value })} required />
-            <input placeholder="External link" value={forms.article.external_link} onChange={(e) => setForm("article", { external_link: e.target.value })} />
-            <input placeholder="DOI link" value={forms.article.doi_link} onChange={(e) => setForm("article", { doi_link: e.target.value })} />
-            <input type="file" onChange={(e) => setForm("article", { file: e.target.files?.[0] || null })} />
-            <button className="primary-btn" type="submit">Create Article</button>
-          </form>
-          {allItems.articles.map((item) => (
-            <div className="item-row" key={item._id}>
-              <span>{item.title}</span>
-              <div className="actions">
-                <button type="button" onClick={() => updateArticle(item)}>Edit</button>
-                <button className="danger-btn" type="button" onClick={() => remove("articles", item._id)}>Delete</button>
-              </div>
-            </div>
-          ))}
-        </section>
-      ) : null}
-
       {activeTab === "editorial-board" ? (
         <section className="form-card admin-panel">
           <h3>Editorial Board</h3>
@@ -418,17 +381,124 @@ export const AdminJournalManagePage = () => {
 
       {activeTab === "articles-in-press" ? (
         <section className="form-card admin-panel">
-          <h3>Articles In Press</h3>
-          <p className="muted-line">Articles in press will be available here.</p>
+          <div className="panel-header">
+            <div>
+              <h3>Articles In Press</h3>
+              <p className="muted-line">Create articles or manage articles in press for this journal.</p>
+            </div>
+          </div>
+          <form className="form-grid" onSubmit={createArticle}>
+            <label>
+              Article Type
+              <select value={forms.article.type} onChange={(e) => setForm("article", { type: e.target.value })}>
+                <option>Research</option>
+                <option>Review</option>
+                <option>Case Study</option>
+                <option>Short Communication</option>
+                <option>Editorial</option>
+                <option>Other</option>
+              </select>
+            </label>
+            <label>
+              Title
+              <input placeholder="Article title" value={forms.article.title} onChange={(e) => setForm("article", { title: e.target.value })} required />
+            </label>
+            <label>
+              Authors
+              <input placeholder="Authors names" value={forms.article.authors} onChange={(e) => setForm("article", { authors: e.target.value })} required />
+            </label>
+            <label>
+              Abstract
+              <textarea placeholder="Article abstract" value={forms.article.abstract} onChange={(e) => setForm("article", { abstract: e.target.value })} required />
+            </label>
+            <label>
+              External Link (Optional)
+              <input placeholder="https://..." value={forms.article.external_link} onChange={(e) => setForm("article", { external_link: e.target.value })} />
+            </label>
+            <label>
+              DOI Link (Optional)
+              <input placeholder="https://doi.org/..." value={forms.article.doi_link} onChange={(e) => setForm("article", { doi_link: e.target.value })} />
+            </label>
+            <label>
+              Upload PDF
+              <input type="file" accept=".pdf,.doc,.docx" onChange={(e) => setForm("article", { file: e.target.files?.[0] || null })} />
+            </label>
+            <button className="primary-btn" type="submit">Create Article</button>
+          </form>
+          <div className="panel-header" style={{ marginTop: "2rem" }}>
+            <h3>All Articles</h3>
+          </div>
+          {allItems.articles.length > 0 ? (
+            allItems.articles.map((item) => (
+              <div className="item-row" key={item._id}>
+                <div>
+                  <strong>{item.title}</strong>
+                  <p className="muted-line" style={{ margin: "0.3rem 0 0" }}>{item.authors}</p>
+                </div>
+                <div className="actions">
+                  <button type="button" onClick={() => updateArticle(item)}>Edit</button>
+                  <button className="danger-btn" type="button" onClick={() => remove("articles", item._id)}>Delete</button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="muted-line">No articles created yet.</p>
+          )}
         </section>
       ) : null}
 
       {activeTab === "current-issue" ? (
         <section className="form-card admin-panel">
           <h3>Current Issue</h3>
+          {forms.currentIssue.archive_volume_ids.length ? (
+            <div className="selected-volumes-preview">
+              {allItems.archiveVolumes
+                .filter((volume) => forms.currentIssue.archive_volume_ids.includes(volume._id))
+                .map((volume) => (
+                  <div key={volume._id} className="selected-volume-card">
+                    <div className="selected-volume-header">
+                      <strong>{volume.year} - {volume.volume_title}</strong>
+                      <span>{volume.article_items?.length || 0} article(s)</span>
+                    </div>
+                    {volume.article_items?.length ? (
+                      <ul className="selected-volume-articles">
+                        {volume.article_items.map((article) => (
+                          <li key={article._id}>{article.title}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="muted-line">No articles in this volume.</p>
+                    )}
+                  </div>
+                ))}
+            </div>
+          ) : null}
           <form className="form-grid" onSubmit={createCurrentIssue}>
-            <input placeholder="Volume title" required value={forms.currentIssue.volume_title} onChange={(e) => setForm("currentIssue", { volume_title: e.target.value })} />
-            <input placeholder="Article IDs (comma-separated)" value={forms.currentIssue.article_ids} onChange={(e) => setForm("currentIssue", { article_ids: e.target.value })} />
+            <label>
+              Volume Title
+              <input placeholder="Volume title" required value={forms.currentIssue.volume_title} onChange={(e) => setForm("currentIssue", { volume_title: e.target.value })} />
+            </label>
+            <label>
+              Select Archive Volumes (Hold Ctrl/Cmd to select multiple)
+              <select 
+                multiple 
+                value={forms.currentIssue.archive_volume_ids} 
+                onChange={(e) => {
+                  const selected = Array.from(e.target.selectedOptions, opt => opt.value);
+                  setForm("currentIssue", { archive_volume_ids: selected });
+                }}
+                style={{ minHeight: "120px" }}
+              >
+                {allItems.archiveVolumes.map((volume) => (
+                  <option key={volume._id} value={volume._id}>
+                    {volume.year} - {volume.volume_title}
+                  </option>
+                ))}
+              </select>
+              <span className="muted-line" style={{ fontSize: "0.85rem", marginTop: "0.3rem", display: "block" }}>
+                {forms.currentIssue.archive_volume_ids.length} volume(s) selected
+              </span>
+            </label>
             <button className="primary-btn" type="submit">Create Current Issue</button>
           </form>
           {allItems.currentIssues.map((item) => (
@@ -447,9 +517,35 @@ export const AdminJournalManagePage = () => {
         <section className="form-card admin-panel">
           <h3>Archive</h3>
           <form className="form-grid" onSubmit={createArchiveVolume}>
-            <input placeholder="Year" type="number" required value={forms.archiveVolume.year} onChange={(e) => setForm("archiveVolume", { year: e.target.value })} />
-            <input placeholder="Volume title" required value={forms.archiveVolume.volume_title} onChange={(e) => setForm("archiveVolume", { volume_title: e.target.value })} />
-            <input placeholder="Article IDs (comma-separated)" value={forms.archiveVolume.article_ids} onChange={(e) => setForm("archiveVolume", { article_ids: e.target.value })} />
+            <label>
+              Year
+              <input placeholder="Year" type="number" required value={forms.archiveVolume.year} onChange={(e) => setForm("archiveVolume", { year: e.target.value })} />
+            </label>
+            <label>
+              Volume Title
+              <input placeholder="Volume title" required value={forms.archiveVolume.volume_title} onChange={(e) => setForm("archiveVolume", { volume_title: e.target.value })} />
+            </label>
+            <label>
+              Select Articles (Hold Ctrl/Cmd to select multiple)
+              <select 
+                multiple 
+                value={forms.archiveVolume.article_ids} 
+                onChange={(e) => {
+                  const selected = Array.from(e.target.selectedOptions, opt => opt.value);
+                  setForm("archiveVolume", { article_ids: selected });
+                }}
+                style={{ minHeight: "120px" }}
+              >
+                {allItems.articles.map((article) => (
+                  <option key={article._id} value={article._id}>
+                    {article.title} ({article.authors})
+                  </option>
+                ))}
+              </select>
+              <span className="muted-line" style={{ fontSize: "0.85rem", marginTop: "0.3rem", display: "block" }}>
+                {forms.archiveVolume.article_ids.length} article(s) selected
+              </span>
+            </label>
             <button className="primary-btn" type="submit">Create Archive Volume</button>
           </form>
           {allItems.archiveVolumes.map((item) => (

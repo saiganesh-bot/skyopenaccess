@@ -9,11 +9,14 @@ import { AdminIndexingPage } from "./pages/admin/AdminIndexingPage";
 import { AdminJournalManagePage } from "./pages/admin/AdminJournalManagePage";
 import { AdminLoginPage } from "./pages/admin/AdminLoginPage";
 import { AdminSubmissionsPage } from "./pages/admin/AdminSubmissionsPage";
+import { AdminTestimonialsPage } from "./pages/admin/AdminTestimonialsPage";
 import { AboutPage } from "./pages/public/AboutPage";
+import { ArticleDetailPage } from "./pages/public/ArticleDetailPage";
 import { AuthorGuidelinesPage } from "./pages/public/AuthorGuidelinesPage";
 import { EbooksPage } from "./pages/public/EbooksPage";
 import { HomePage } from "./pages/public/HomePage";
 import { JournalDetailPage } from "./pages/public/JournalDetailPage";
+import { ArchiveVolumePage } from "./pages/public/ArchiveVolumePage";
 import { JournalsPage } from "./pages/public/JournalsPage";
 import { MembershipPage } from "./pages/public/MembershipPage";
 import { OpenAccessPage } from "./pages/public/OpenAccessPage";
@@ -32,6 +35,8 @@ const App = () => {
         <Route path="/open-access" element={<OpenAccessPage />} />
         <Route path="/journals" element={<JournalsPage />} />
         <Route path="/journals/:slug" element={<JournalDetailPage />} />
+        <Route path="/journals/:slug/archive/:volumeId" element={<ArchiveVolumePage />} />
+        <Route path="/article/:articleId" element={<ArticleDetailPage />} />
         <Route path="/journal-details" element={<Navigate to="/journals" replace />} />
         <Route path="/journal-details/:slug" element={<JournalDetailPage />} />
         <Route path="/peer-review" element={<PeerReviewPage />} />
@@ -60,7 +65,7 @@ const App = () => {
         <Route path="journals" element={<AdminDashboardPage />} />
         <Route path="journals/:journalId/manage" element={<AdminJournalManagePage />} />
         <Route path="submissions" element={<AdminSubmissionsPage />} />
-        <Route path="testimonials" element={<AdminContentPage initialTab="testimonials" showTabs={false} />} />
+        <Route path="testimonials" element={<AdminTestimonialsPage />} />
         <Route
           path="videos"
           element={
