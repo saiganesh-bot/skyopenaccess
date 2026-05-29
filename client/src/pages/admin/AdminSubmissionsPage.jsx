@@ -32,8 +32,19 @@ export const AdminSubmissionsPage = () => {
   }, []);
 
   const deleteSubmission = async (id) => {
-    await http.delete(`/submissions/${id}`);
-    await loadData();
+    const confirmed = window.confirm("Are you sure you want to delete this submission? This action cannot be undone.");
+    if (!confirmed) return;
+    try {
+      setError("");
+      setInfo("");
+      await http.delete(`/submissions/${id}`);
+      await loadData();
+      window.alert("Submission deleted successfully.");
+      setInfo("Submission deleted successfully.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to delete submission");
+      window.alert(err.response?.data?.message || "Failed to delete submission");
+    }
   };
 
   return (

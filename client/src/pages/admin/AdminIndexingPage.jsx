@@ -29,14 +29,34 @@ export const AdminIndexingPage = () => {
     if (!logoFile) return;
     const data = new FormData();
     data.append("logo", logoFile);
-    await http.post("/logos", data);
-    setLogoFile(null);
-    await loadData();
+    try {
+      setError("");
+      setInfo("");
+      await http.post("/logos", data);
+      setLogoFile(null);
+      await loadData();
+      window.alert("Logo uploaded successfully.");
+      setInfo("Logo uploaded successfully.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to upload logo");
+      window.alert(err.response?.data?.message || "Failed to upload logo");
+    }
   };
 
   const deleteLogo = async (id) => {
-    await http.delete(`/logos/${id}`);
-    await loadData();
+    const confirmed = window.confirm("Are you sure you want to delete this indexing logo? This action cannot be undone.");
+    if (!confirmed) return;
+    try {
+      setError("");
+      setInfo("");
+      await http.delete(`/logos/${id}`);
+      await loadData();
+      window.alert("Logo deleted successfully.");
+      setInfo("Logo deleted successfully.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to delete logo");
+      window.alert(err.response?.data?.message || "Failed to delete logo");
+    }
   };
 
   return (

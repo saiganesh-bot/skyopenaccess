@@ -6,7 +6,9 @@ const pptSchema = new mongoose.Schema(
     title: { type: String, required: true },
     file_url: String,
     file_public_id: String,
-    format: String
+    format: String,
+    thumbnail_url: String,
+    thumbnail_public_id: String
   },
   { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
 );

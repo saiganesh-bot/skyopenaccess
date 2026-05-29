@@ -3349,3 +3349,6 @@ img {
 p{
   text-align: justify;
 }
+section.about-section-main {
+    padding: 0 10rem;
+}

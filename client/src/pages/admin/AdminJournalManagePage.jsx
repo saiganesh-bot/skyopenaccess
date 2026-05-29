@@ -35,6 +35,8 @@ export const AdminJournalManagePage = () => {
     cover: null
   });
   const [cropImageSrc, setCropImageSrc] = useState("");
+  const [cropType, setCropType] = useState(""); // "journal-cover", "ppt-thumbnail", or "video-thumbnail"
+
   const [forms, setForms] = useState({
     article: {
       type: "Research",
@@ -48,8 +50,8 @@ export const AdminJournalManagePage = () => {
     boardMember: { name: "", description: "", image: null },
     currentIssue: { volume_title: "", archive_volume_ids: [] },
     archiveVolume: { year: "", volume_title: "", article_ids: [] },
-    video: { title: "", youtube_url: "" },
-    ppt: { title: "", file: null },
+    video: { title: "", youtube_url: "", thumbnail: null },
+    ppt: { title: "", file: null, thumbnail: null },
     indexingLogo: { name: "", image: null }
   });
   const [allItems, setAllItems] = useState({
@@ -118,12 +120,13 @@ export const AdminJournalManagePage = () => {
     };
   }, [cropImageSrc]);
 
-  const handleCoverPick = (event) => {
+  const handleCropPick = (event, type) => {
     const file = event.target.files?.[0];
     if (!file) return;
     if (cropImageSrc) URL.revokeObjectURL(cropImageSrc);
     const nextSrc = URL.createObjectURL(file);
     setCropImageSrc(nextSrc);
+    setCropType(type);
     event.target.value = "";
   };
 
@@ -133,7 +136,13 @@ export const AdminJournalManagePage = () => {
   };
 
   const handleCropComplete = (file) => {
-    setEditJournalForm((prev) => ({ ...prev, cover: file }));
+    if (cropType === "journal-cover") {
+      setEditJournalForm((prev) => ({ ...prev, cover: file }));
+    } else if (cropType === "ppt-thumbnail") {
+      setForm("ppt", { thumbnail: file });
+    } else if (cropType === "video-thumbnail") {
+      setForm("video", { thumbnail: file });
+    }
     handleCropClose();
   };
 
@@ -154,13 +163,17 @@ export const AdminJournalManagePage = () => {
       setJournal(response.journal);
       setEditJournalForm((prev) => ({ ...prev, cover: null }));
       setInfo("Journal updated successfully.");
+      window.alert("Journal updated successfully.");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to update journal");
+      window.alert(err.response?.data?.message || "Failed to update journal");
     }
   };
 
   const createArticle = async (e) => {
     e.preventDefault();
+    setError("");
+    setInfo("");
     const data = new FormData();
     Object.entries(forms.article).forEach(([k, v]) => {
       if (k === "file") return;
@@ -168,122 +181,269 @@ export const AdminJournalManagePage = () => {
     });
     data.append("journal_id", journalId);
     if (forms.article.file) data.append("file", forms.article.file);
-    await http.post("/content/articles", data);
-    await load();
+    try {
+      await http.post("/content/articles", data);
+      await load();
+      setInfo("Article created successfully.");
+      window.alert("Article created successfully.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to create article");
+      window.alert(err.response?.data?.message || "Failed to create article");
+    }
   };
 
   const updateArticle = async (item) => {
     const title = window.prompt("Update title", item.title);
     if (!title) return;
-    await http.put(`/content/articles/${item._id}`, { title });
-    await load();
+    try {
+      setError("");
+      setInfo("");
+      await http.put(`/content/articles/${item._id}`, { title });
+      await load();
+      setInfo("Article updated successfully.");
+      window.alert("Article updated successfully.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to update article");
+      window.alert(err.response?.data?.message || "Failed to update article");
+    }
   };
 
   const createBoardMember = async (e) => {
     e.preventDefault();
+    setError("");
+    setInfo("");
     const data = new FormData();
     data.append("journal_id", journalId);
     data.append("name", forms.boardMember.name);
     data.append("description", forms.boardMember.description);
     if (forms.boardMember.image) data.append("image", forms.boardMember.image);
-    await http.post("/content/board-members", data);
-    await load();
+    try {
+      await http.post("/content/board-members", data);
+      await load();
+      setInfo("Board member created successfully.");
+      window.alert("Board member created successfully.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to create board member");
+      window.alert(err.response?.data?.message || "Failed to create board member");
+    }
   };
 
   const updateBoardMember = async (item) => {
     const name = window.prompt("Update name", item.name);
     if (!name) return;
-    await http.put(`/content/board-members/${item._id}`, { name });
-    await load();
+    try {
+      setError("");
+      setInfo("");
+      await http.put(`/content/board-members/${item._id}`, { name });
+      await load();
+      setInfo("Board member updated successfully.");
+      window.alert("Board member updated successfully.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to update board member");
+      window.alert(err.response?.data?.message || "Failed to update board member");
+    }
   };
 
   const createCurrentIssue = async (e) => {
     e.preventDefault();
-    await http.post("/content/current-issues", {
-      journal_id: journalId,
-      volume_title: forms.currentIssue.volume_title,
-      archive_volume_ids: forms.currentIssue.archive_volume_ids
-    });
-    await load();
-    setForm("currentIssue", { volume_title: "", archive_volume_ids: [] });
+    setError("");
+    setInfo("");
+    try {
+      await http.post("/content/current-issues", {
+        journal_id: journalId,
+        volume_title: forms.currentIssue.volume_title,
+        archive_volume_ids: forms.currentIssue.archive_volume_ids
+      });
+      await load();
+      setForm("currentIssue", { volume_title: "", archive_volume_ids: [] });
+      setInfo("Current issue created successfully.");
+      window.alert("Current issue created successfully.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to create current issue");
+      window.alert(err.response?.data?.message || "Failed to create current issue");
+    }
   };
 
   const updateCurrentIssue = async (item) => {
     const volume_title = window.prompt("Update volume title", item.volume_title);
     if (!volume_title) return;
-    await http.put(`/content/current-issues/${item._id}`, { volume_title });
-    await load();
+    try {
+      setError("");
+      setInfo("");
+      await http.put(`/content/current-issues/${item._id}`, { volume_title });
+      await load();
+      setInfo("Current issue updated successfully.");
+      window.alert("Current issue updated successfully.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to update current issue");
+      window.alert(err.response?.data?.message || "Failed to update current issue");
+    }
   };
 
   const createArchiveVolume = async (e) => {
     e.preventDefault();
-    await http.post("/content/archive-volumes", {
-      journal_id: journalId,
-      year: Number(forms.archiveVolume.year),
-      volume_title: forms.archiveVolume.volume_title,
-      article_ids: forms.archiveVolume.article_ids
-    });
-    await load();
-    setForm("archiveVolume", { year: "", volume_title: "", article_ids: [] });
+    setError("");
+    setInfo("");
+    try {
+      await http.post("/content/archive-volumes", {
+        journal_id: journalId,
+        year: Number(forms.archiveVolume.year),
+        volume_title: forms.archiveVolume.volume_title,
+        article_ids: forms.archiveVolume.article_ids
+      });
+      await load();
+      setForm("archiveVolume", { year: "", volume_title: "", article_ids: [] });
+      setInfo("Archive volume created successfully.");
+      window.alert("Archive volume created successfully.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to create archive volume");
+      window.alert(err.response?.data?.message || "Failed to create archive volume");
+    }
   };
 
   const updateArchiveVolume = async (item) => {
     const volume_title = window.prompt("Update volume title", item.volume_title);
     if (!volume_title) return;
-    await http.put(`/content/archive-volumes/${item._id}`, { volume_title });
-    await load();
+    try {
+      setError("");
+      setInfo("");
+      await http.put(`/content/archive-volumes/${item._id}`, { volume_title });
+      await load();
+      setInfo("Archive volume updated successfully.");
+      window.alert("Archive volume updated successfully.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to update archive volume");
+      window.alert(err.response?.data?.message || "Failed to update archive volume");
+    }
   };
 
   const createVideo = async (e) => {
     e.preventDefault();
-    await http.post("/content/videos", { ...forms.video, journal_id: journalId });
-    await load();
+    setError("");
+    setInfo("");
+    const data = new FormData();
+    data.append("journal_id", journalId);
+    data.append("title", forms.video.title);
+    data.append("youtube_url", forms.video.youtube_url);
+    if (forms.video.thumbnail) {
+      data.append("thumbnail", forms.video.thumbnail);
+    }
+    try {
+      await http.post("/content/videos", data);
+      await load();
+      setForm("video", { title: "", youtube_url: "", thumbnail: null });
+      setInfo("Video created successfully.");
+      window.alert("Video created successfully.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to create video");
+      window.alert(err.response?.data?.message || "Failed to create video");
+    }
   };
 
   const updateVideo = async (item) => {
     const title = window.prompt("Update title", item.title);
     if (!title) return;
-    await http.put(`/content/videos/${item._id}`, { title });
-    await load();
+    try {
+      setError("");
+      setInfo("");
+      await http.put(`/content/videos/${item._id}`, { title });
+      await load();
+      setInfo("Video updated successfully.");
+      window.alert("Video updated successfully.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to update video");
+      window.alert(err.response?.data?.message || "Failed to update video");
+    }
   };
 
   const createPpt = async (e) => {
     e.preventDefault();
+    setError("");
+    setInfo("");
     const data = new FormData();
     data.append("journal_id", journalId);
     data.append("title", forms.ppt.title);
     if (forms.ppt.file) data.append("file", forms.ppt.file);
-    await http.post("/content/ppts", data);
-    await load();
+    if (forms.ppt.thumbnail) data.append("thumbnail", forms.ppt.thumbnail);
+    try {
+      await http.post("/content/ppts", data);
+      await load();
+      setForm("ppt", { title: "", file: null, thumbnail: null });
+      setInfo("PPT created successfully.");
+      window.alert("PPT created successfully.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to create PPT");
+      window.alert(err.response?.data?.message || "Failed to create PPT");
+    }
   };
 
   const updatePpt = async (item) => {
     const title = window.prompt("Update title", item.title);
     if (!title) return;
-    await http.put(`/content/ppts/${item._id}`, { title });
-    await load();
+    try {
+      setError("");
+      setInfo("");
+      await http.put(`/content/ppts/${item._id}`, { title });
+      await load();
+      setInfo("PPT updated successfully.");
+      window.alert("PPT updated successfully.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to update PPT");
+      window.alert(err.response?.data?.message || "Failed to update PPT");
+    }
   };
 
   const createIndexingLogo = async (e) => {
     e.preventDefault();
+    setError("");
+    setInfo("");
     const data = new FormData();
     data.append("journal_id", journalId);
     data.append("name", forms.indexingLogo.name);
     if (forms.indexingLogo.image) data.append("image", forms.indexingLogo.image);
-    await http.post("/content/indexing-logos", data);
-    await load();
+    try {
+      await http.post("/content/indexing-logos", data);
+      await load();
+      setInfo("Indexing logo created successfully.");
+      window.alert("Indexing logo created successfully.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to create indexing logo");
+      window.alert(err.response?.data?.message || "Failed to create indexing logo");
+    }
   };
 
   const updateIndexingLogo = async (item) => {
     const name = window.prompt("Update name", item.name);
     if (!name) return;
-    await http.put(`/content/indexing-logos/${item._id}`, { name });
-    await load();
+    try {
+      setError("");
+      setInfo("");
+      await http.put(`/content/indexing-logos/${item._id}`, { name });
+      await load();
+      setInfo("Indexing logo updated successfully.");
+      window.alert("Indexing logo updated successfully.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to update indexing logo");
+      window.alert(err.response?.data?.message || "Failed to update indexing logo");
+    }
   };
 
   const remove = async (path, id) => {
-    await http.delete(`/content/${path}/${id}`);
-    await load();
+    const itemName = path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, ' ');
+    const confirmed = window.confirm(`Are you sure you want to delete this ${itemName}? This action cannot be undone.`);
+    if (!confirmed) return;
+
+    try {
+      setError("");
+      setInfo("");
+      await http.delete(`/content/${path}/${id}`);
+      await load();
+      setInfo(`${itemName} deleted successfully.`);
+      window.alert(`${itemName} deleted successfully.`);
+    } catch (err) {
+      setError(err.response?.data?.message || `Failed to delete ${itemName}`);
+      window.alert(err.response?.data?.message || `Failed to delete ${itemName}`);
+    }
   };
 
   return (
@@ -346,7 +506,7 @@ export const AdminJournalManagePage = () => {
             </label>
             <label>
               Replace Cover (1024x1536)
-              <input type="file" accept="image/*" onChange={handleCoverPick} />
+              <input type="file" accept="image/*" onChange={(e) => handleCropPick(e, "journal-cover")} />
               {editJournalForm.cover ? (
                 <span className="muted-line">Cropped image ready to upload.</span>
               ) : null}
@@ -565,7 +725,17 @@ export const AdminJournalManagePage = () => {
           <h3>PPTs</h3>
           <form className="form-grid" onSubmit={createPpt}>
             <input placeholder="Title" required value={forms.ppt.title} onChange={(e) => setForm("ppt", { title: e.target.value })} />
-            <input type="file" onChange={(e) => setForm("ppt", { file: e.target.files?.[0] || null })} />
+            <label style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+              PPT / PDF File
+              <input type="file" onChange={(e) => setForm("ppt", { file: e.target.files?.[0] || null })} />
+            </label>
+            <label style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+              Upload Cover / Thumbnail (16:9 ratio)
+              <input type="file" accept="image/*" onChange={(e) => handleCropPick(e, "ppt-thumbnail")} />
+              {forms.ppt.thumbnail ? (
+                <span className="muted-line" style={{ color: "green", fontSize: "0.85rem" }}>Cropped thumbnail ready to upload.</span>
+              ) : null}
+            </label>
             <button className="primary-btn" type="submit">Create PPT</button>
           </form>
           {allItems.ppts.map((item) => (
@@ -586,6 +756,13 @@ export const AdminJournalManagePage = () => {
           <form className="form-grid" onSubmit={createVideo}>
             <input placeholder="Title" required value={forms.video.title} onChange={(e) => setForm("video", { title: e.target.value })} />
             <input placeholder="YouTube URL" required value={forms.video.youtube_url} onChange={(e) => setForm("video", { youtube_url: e.target.value })} />
+            <label style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+              Upload Cover / Thumbnail (16:9 ratio)
+              <input type="file" accept="image/*" onChange={(e) => handleCropPick(e, "video-thumbnail")} />
+              {forms.video.thumbnail ? (
+                <span className="muted-line" style={{ color: "green", fontSize: "0.85rem" }}>Cropped thumbnail ready to upload.</span>
+              ) : null}
+            </label>
             <button className="primary-btn" type="submit">Create Video</button>
           </form>
           {allItems.videos.map((item) => (
@@ -623,8 +800,9 @@ export const AdminJournalManagePage = () => {
       {cropImageSrc ? (
         <ImageCropModal
           imageSrc={cropImageSrc}
-          outputWidth={1024}
-          outputHeight={1536}
+          outputWidth={cropType === "journal-cover" ? 1024 : 1600}
+          outputHeight={cropType === "journal-cover" ? 1536 : 900}
+          title={cropType === "journal-cover" ? "Crop cover (2:3)" : cropType === "ppt-thumbnail" ? "Crop PPT thumbnail (16:9)" : "Crop video thumbnail (16:9)"}
           onClose={handleCropClose}
           onComplete={handleCropComplete}
         />

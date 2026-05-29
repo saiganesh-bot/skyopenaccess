@@ -1,6 +1,6 @@
 export const AboutPage = () => (
   <main>
-    <section className="about-section">
+    <section className="about-section-main">
       <div className="about-row observe">
         <div className="about-text from-right">
           <h1>About Us</h1>

@@ -7,7 +7,8 @@ export const ImageCropModal = ({
   onClose,
   onComplete,
   outputWidth = 1024,
-  outputHeight = 1536
+  outputHeight = 1536,
+  title = "Crop cover"
 }) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -29,7 +30,7 @@ export const ImageCropModal = ({
       <div className="crop-modal__backdrop" onClick={onClose} />
       <div className="crop-modal__panel">
         <div className="crop-modal__header">
-          <h3>Crop cover (2:3)</h3>
+          <h3>{title}</h3>
           <button type="button" className="secondary-btn" onClick={onClose}>
             Close
           </button>

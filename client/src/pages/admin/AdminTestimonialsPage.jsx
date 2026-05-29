@@ -84,6 +84,7 @@ export const AdminTestimonialsPage = () => {
         }
         await http.put(`/content/testimonials/${editingId}`, data);
         setInfo("Testimonial updated successfully");
+        window.alert("Testimonial updated successfully.");
       } else {
         // Create new testimonial
         const data = new FormData();
@@ -92,11 +93,13 @@ export const AdminTestimonialsPage = () => {
         if (formData.image) data.append("image", formData.image);
         await http.post("/content/testimonials", data);
         setInfo("Testimonial created successfully");
+        window.alert("Testimonial created successfully.");
       }
       resetForm();
       await loadTestimonials();
     } catch (err) {
       setError(err.response?.data?.message || "Failed to save testimonial");
+      window.alert(err.response?.data?.message || "Failed to save testimonial");
     }
   };
 
@@ -120,9 +123,11 @@ export const AdminTestimonialsPage = () => {
     try {
       await http.delete(`/content/testimonials/${id}`);
       setInfo("Testimonial deleted successfully");
+      window.alert("Testimonial deleted successfully.");
       await loadTestimonials();
     } catch (err) {
       setError(err.response?.data?.message || "Failed to delete testimonial");
+      window.alert(err.response?.data?.message || "Failed to delete testimonial");
     }
   };
 

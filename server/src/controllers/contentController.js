@@ -370,22 +370,42 @@ export const getVideo = asyncHandler(async (req, res) => {
 });
 
 export const createVideo = asyncHandler(async (req, res) => {
-  const video = await Video.create(req.body);
+  const payload = { ...req.body };
+  if (req.file?.buffer) {
+    const upload = await uploadBufferToCloudinary(req.file.buffer, {
+      folder: "journals/videos/thumbnails",
+      resource_type: "image"
+    });
+    payload.thumbnail_url = upload.secure_url;
+    payload.thumbnail_public_id = upload.public_id;
+  }
+  const video = await Video.create(payload);
   res.status(201).json({ video });
 });
 
 export const updateVideo = asyncHandler(async (req, res) => {
-  const video = await Video.findByIdAndUpdate(getValidatedObjectId(req.params.id, "video"), req.body, {
-    new: true,
-    runValidators: true
-  });
+  const video = await Video.findById(getValidatedObjectId(req.params.id, "video"));
   if (!video) return res.status(404).json({ message: "Video not found" });
+
+  Object.assign(video, req.body);
+  if (req.file?.buffer) {
+    const upload = await uploadBufferToCloudinary(req.file.buffer, {
+      folder: "journals/videos/thumbnails",
+      resource_type: "image"
+    });
+    await safeDestroy(video.thumbnail_public_id, "image");
+    video.thumbnail_url = upload.secure_url;
+    video.thumbnail_public_id = upload.public_id;
+  }
+
+  await video.save();
   res.status(200).json({ video });
 });
 
 export const deleteVideo = asyncHandler(async (req, res) => {
   const video = await Video.findById(getValidatedObjectId(req.params.id, "video"));
   if (!video) return res.status(404).json({ message: "Video not found" });
+  await safeDestroy(video.thumbnail_public_id, "image");
   await video.deleteOne();
   res.status(200).json({ message: "Video deleted" });
 });
@@ -403,22 +423,35 @@ export const getPpt = asyncHandler(async (req, res) => {
 });
 
 export const createPpt = asyncHandler(async (req, res) => {
-  if (!req.file?.buffer) {
+  const pptFile = req.files?.file?.[0];
+  const thumbnailFile = req.files?.thumbnail?.[0];
+
+  if (!pptFile) {
     return res.status(400).json({ message: "PPT/PDF file is required" });
   }
 
-  const upload = await uploadBufferToCloudinary(req.file.buffer, {
+  const upload = await uploadBufferToCloudinary(pptFile.buffer, {
     folder: "journals/ppts",
     resource_type: "raw"
   });
 
-  const ppt = await Ppt.create({
+  const payload = {
     ...req.body,
     file_url: upload.secure_url,
     file_public_id: upload.public_id,
-    format: req.file.mimetype
-  });
+    format: pptFile.mimetype
+  };
 
+  if (thumbnailFile) {
+    const thumbUpload = await uploadBufferToCloudinary(thumbnailFile.buffer, {
+      folder: "journals/ppts/thumbnails",
+      resource_type: "image"
+    });
+    payload.thumbnail_url = thumbUpload.secure_url;
+    payload.thumbnail_public_id = thumbUpload.public_id;
+  }
+
+  const ppt = await Ppt.create(payload);
   res.status(201).json({ ppt });
 });
 
@@ -427,15 +460,29 @@ export const updatePpt = asyncHandler(async (req, res) => {
   if (!ppt) return res.status(404).json({ message: "PPT not found" });
 
   Object.assign(ppt, req.body);
-  if (req.file?.buffer) {
-    const upload = await uploadBufferToCloudinary(req.file.buffer, {
+
+  const pptFile = req.files?.file?.[0];
+  const thumbnailFile = req.files?.thumbnail?.[0];
+
+  if (pptFile) {
+    const upload = await uploadBufferToCloudinary(pptFile.buffer, {
       folder: "journals/ppts",
       resource_type: "raw"
     });
     await safeDestroy(ppt.file_public_id, "raw");
     ppt.file_url = upload.secure_url;
     ppt.file_public_id = upload.public_id;
-    ppt.format = req.file.mimetype;
+    ppt.format = pptFile.mimetype;
+  }
+
+  if (thumbnailFile) {
+    const thumbUpload = await uploadBufferToCloudinary(thumbnailFile.buffer, {
+      folder: "journals/ppts/thumbnails",
+      resource_type: "image"
+    });
+    await safeDestroy(ppt.thumbnail_public_id, "image");
+    ppt.thumbnail_url = thumbUpload.secure_url;
+    ppt.thumbnail_public_id = thumbUpload.public_id;
   }
 
   await ppt.save();
@@ -446,6 +493,7 @@ export const deletePpt = asyncHandler(async (req, res) => {
   const ppt = await Ppt.findById(getValidatedObjectId(req.params.id, "ppt"));
   if (!ppt) return res.status(404).json({ message: "PPT not found" });
   await safeDestroy(ppt.file_public_id, "raw");
+  await safeDestroy(ppt.thumbnail_public_id, "image");
   await ppt.deleteOne();
   res.status(200).json({ message: "PPT deleted" });
 });

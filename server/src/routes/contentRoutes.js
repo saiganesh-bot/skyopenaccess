@@ -45,7 +45,7 @@ import {
   updateVideo
 } from "../controllers/contentController.js";
 import { adminOnly, protect } from "../middlewares/auth.js";
-import { documentUpload, imageUpload } from "../middlewares/upload.js";
+import { documentUpload, imageUpload, pptUpload } from "../middlewares/upload.js";
 
 const router = Router();
 
@@ -79,14 +79,14 @@ router.delete("/archive-volumes/:id", protect, adminOnly, deleteArchiveVolume);
 
 router.get("/videos", listVideos);
 router.get("/videos/:id", getVideo);
-router.post("/videos", protect, adminOnly, createVideo);
-router.put("/videos/:id", protect, adminOnly, updateVideo);
+router.post("/videos", protect, adminOnly, imageUpload.single("thumbnail"), createVideo);
+router.put("/videos/:id", protect, adminOnly, imageUpload.single("thumbnail"), updateVideo);
 router.delete("/videos/:id", protect, adminOnly, deleteVideo);
 
 router.get("/ppts", listPpts);
 router.get("/ppts/:id", getPpt);
-router.post("/ppts", protect, adminOnly, documentUpload.single("file"), createPpt);
-router.put("/ppts/:id", protect, adminOnly, documentUpload.single("file"), updatePpt);
+router.post("/ppts", protect, adminOnly, pptUpload.fields([{ name: "file", maxCount: 1 }, { name: "thumbnail", maxCount: 1 }]), createPpt);
+router.put("/ppts/:id", protect, adminOnly, pptUpload.fields([{ name: "file", maxCount: 1 }, { name: "thumbnail", maxCount: 1 }]), updatePpt);
 router.delete("/ppts/:id", protect, adminOnly, deletePpt);
 
 router.get("/testimonials", listTestimonials);
