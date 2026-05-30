@@ -24,7 +24,6 @@ export const EbooksPage = () => (
 
     <section className="ebooks-banner-section fade-up">
       <div className="ebooks-banner">
-        <div className="glow" />
 
         <div className="ebooks-text">
           <div className="hero-eyebrow">Digital Library</div>
@@ -36,17 +35,9 @@ export const EbooksPage = () => (
         </div>
 
         <div className="ebooks-images">
-          <div className="book book1">
-            <img src="/images/journal1.svg" alt="Book" />
-          </div>
-
-          <div className="book book2">
-            <img src="/images/journal2.png" alt="Book" />
-          </div>
-
-          <div className="book book3">
-            <img src="/images/journal3.svg" alt="Book" />
-          </div>
+            <img src="/images/journal1.svg" className="book book1" alt="Book" />
+            <img src="/images/journal2.png" className="book book2" alt="Book" />
+            <img src="/images/journal3.svg" className="book book3" alt="Book" />
         </div>
       </div>
 

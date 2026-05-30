@@ -206,7 +206,7 @@ const previewText = (value) => {
           <h2>Advancing Science Through Open Knowledge</h2>
 
           <p>
-            At Open Ethic Publishers, We Believe That The Future Of Scientific Progress Lies
+            At SKY open Access Publishers, We Believe That The Future Of Scientific Progress Lies
             Transparency, Collaboration, And Accessibility. As Independent International Publisher
             Of Peer-Reviewed Journals Across Clinical, Medical, And Scientific Disciplines
           </p>

@@ -22,7 +22,7 @@ body {
 .container {
   max-width: 1200px;
   margin: auto;
-  padding: 0 20px;
+  padding: 0;
 }
 
 /* ======================================== Buttons ========================= */
@@ -114,6 +114,7 @@ body {
 
 main {
   margin-top: 18vh;
+  padding: 0 4%;
 }
 
 /* MAIN FLEX */
@@ -719,8 +720,12 @@ main {
   z-index: 2;
 }
 
+main.mobile-main {
+  padding: 0 5%;
+}
+
 .apart-section {
-  margin-top: 180px;
+  margin-top: 15%;
   text-align: center;
 }
 
@@ -737,7 +742,7 @@ main {
   align-items: flex-end;
   gap: 28px;
   flex-wrap: wrap;
-  padding-bottom: 15vh;
+  padding-bottom: 5vh;
 }
 
 .apart-cards .card {
@@ -997,6 +1002,25 @@ main {
   font-size: 18px;
 }
 
+@media (max-width:720px) {
+  .book-banner {
+    height: 25vh;
+    margin-top: 0;
+
+  }
+
+  .book-banner-buttons {
+    bottom: 14%;
+    left: 25px;
+    transform: translateX(0);
+  }
+
+  .banner-btn {
+    padding: 12px;
+  }
+
+}
+
 /* ================================================= EBOOKS SECTION ========================================== */
 .ebooks-banner {
   width: 100%;
@@ -1005,7 +1029,6 @@ main {
   display: flex;
   align-items: center;
   padding: 90px 20px;
-  margin-top: 100px;
   margin-left: 140px;
 }
 
@@ -2028,9 +2051,9 @@ li {
   }
 
   .testimonial-arrow {
-    width: 42px;
-    height: 42px;
+    display: none;
   }
+
 }
 
 /* ================= LEFT CONTENT ================= */
@@ -2714,6 +2737,7 @@ li {
   .submission-section {
     margin: 15px;
     padding: 25px;
+    width: 95%;
   }
 
   .submission-form {
@@ -2906,9 +2930,13 @@ img {
   /* TESTIMONIALS MOBILE */
   .testimonial-section {
     flex-direction: column !important;
-    margin: 2rem 1.5rem !important;
+    margin: 5rem 1.5rem !important;
     width: calc(100% - 3rem) !important;
     gap: 30px !important;
+  }
+
+  .testimonial-arrow.left {
+    left: 380px;
   }
 
   .left-content {
@@ -3095,10 +3123,7 @@ img {
     font-size: 26px;
   }
 
-  .submission-section {
-    margin: 15px;
-    padding: 20px;
-  }
+
 
 }
 
@@ -3507,4 +3532,68 @@ section.about-section-main {
     gap: 10px;
     align-items: center;
   }
+
+
+  /* ebooks */
+  .ebooks-banner {
+    width: 100%;
+    height: 380px;
+    background: linear-gradient(#ffffff, #ffffff);
+    display: flex;
+    padding: 0;
+    margin: 0;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ebooks-text {
+    display: flex;
+    padding: 0;
+    max-width: 520px;
+    color: var(--orange);
+    font-family: var(--font-secondary);
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .ebooks-text h1 {
+    font-family: var(--font-secondary);
+    font-size: 4.5rem;
+    font-weight: 900;
+  }
+
+  .tagline {
+    margin-top: 10px;
+    font-size: 1rem;
+    opacity: 0.9;
+    font-style: italic;
+    font-family: var(--font-secondary);
+    color: black;
+  }
+
+  .ebooks-images {
+    display: none;
+    position: absolute;
+    right: 180px;
+    top: 28%;
+    transform: translateY(-50%);
+    width: 340px;
+    height: 260px;
+  }
+
+  .stats {
+    display: flex;
+    gap: 40px;
+    margin-top: 40px;
+    font-family: var(--font-secondary);
+    flex-direction: column;
+  }
+
+  .ebooks-content {
+    max-width: 900px;
+    margin: auto;
+    padding: 0;
+    margin: 20% 8%;
+  }
+
 }

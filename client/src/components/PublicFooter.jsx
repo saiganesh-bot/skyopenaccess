@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { http } from "../api/http";
 
+
 export const PublicFooter = () => {
   const [logos, setLogos] = useState([]);
 
@@ -11,6 +12,15 @@ export const PublicFooter = () => {
       .then((res) => setLogos(res.data.logos || []))
       .catch(() => setLogos([]));
   }, []);
+
+  // Google Maps Embed: put your API key in client/.env or .env.local as VITE_GOOGLE_MAPS_API_KEY
+  const mapsKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  const mapAddress = 'H.NO: 9-223 /H/ 4 MAISAMMA GUTTA GHATKESAR MEDCHAL DISTRICT 501301';
+  const mapSrc = mapsKey
+    ? `https://www.google.com/maps/embed/v1/place?key=${mapsKey}&q=${encodeURIComponent(
+        mapAddress
+      )}`
+    : null;
 
   return (
     <>
@@ -91,7 +101,24 @@ export const PublicFooter = () => {
 
           <div className="footer-box">
             <h3>Reach Us</h3>
-            <img src="/images/map.png" className="map-img" alt="Map" />
+            {mapSrc ? (
+              <iframe
+                title="SKY Open Access location"
+                src={mapSrc}
+                className="map-img"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+              />
+            ) : (
+              <>
+                <img src="/images/map.png" className="map-img" alt="Map" />
+                {typeof console !== 'undefined' &&
+                  console.warn(
+                    'VITE_GOOGLE_MAPS_API_KEY not set — using static map image fallback'
+                  )}
+              </>
+            )}
           </div>
         </div>
       </footer>
