@@ -1,5 +1,5 @@
 export const AuthorGuidelinesPage = () => (
-  <main>
+  <main className="author-guidelines-main">
     <section className="author-guidelines-section observe">
       <div className="author-container">
         <div className="author-text from-left">

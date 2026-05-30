@@ -1,18 +1,19 @@
 export const PeerReviewPage = () => (
   <main>
     <section className="peer-review-section observe">
+      <h1>Peer Review Process</h1>
+
+      <p>
+        At SKY Open Access Publishers, we are dedicated to maintaining the highest standards of
+        academic excellence, integrity, and scientific rigor. A strong and transparent peer-
+        review system is central to ensuring the quality and credibility of the research we
+        publish. Peer review plays a vital role in scholarly publishing by evaluating research
+        for accuracy, originality, and relevance before it becomes part of the scientific
+        record.
+      </p>
       <div className="peer-container">
         <div className="peer-text from-left">
-          <h1>Peer Review Process</h1>
 
-          <p>
-            At SKY Open Access Publishers, we are dedicated to maintaining the highest standards of
-            academic excellence, integrity, and scientific rigor. A strong and transparent peer-
-            review system is central to ensuring the quality and credibility of the research we
-            publish. Peer review plays a vital role in scholarly publishing by evaluating research
-            for accuracy, originality, and relevance before it becomes part of the scientific
-            record.
-          </p>
 
           <h2 className="fade-up">What is Peer Review?</h2>
 
@@ -38,6 +39,16 @@ export const PeerReviewPage = () => (
               anonymous, reducing bias and focusing solely on the quality of the research.
             </li>
           </ul>
+          <h2 className="fade-up pr-h2">Why Peer Review Matters</h2>
+
+          <p className="fade-up">
+            Peer review is a vital mechanism of quality control in academia. It helps identify
+            errors, improve clarity, and verify that research is reliable and well-supported. This
+            process enhances the credibility of academic publishing and builds trust among scholars,
+            institutions, and the public. Reviewers also play an essential role in strengthening the
+            academic community. Their contributions support the advancement of science by ensuring
+            only high-quality work is published.
+          </p>
         </div>
 
         <div className="peer-image from-right">
@@ -46,16 +57,7 @@ export const PeerReviewPage = () => (
       </div>
 
       <div className="peer-full-text">
-        <h2 className="fade-up">Why Peer Review Matters</h2>
 
-        <p className="fade-up">
-          Peer review is a vital mechanism of quality control in academia. It helps identify
-          errors, improve clarity, and verify that research is reliable and well-supported. This
-          process enhances the credibility of academic publishing and builds trust among scholars,
-          institutions, and the public. Reviewers also play an essential role in strengthening the
-          academic community. Their contributions support the advancement of science by ensuring
-          only high-quality work is published.
-        </p>
 
         <h2 className="fade-up">Our Peer Review Workflow</h2>
 

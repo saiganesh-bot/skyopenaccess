@@ -171,12 +171,12 @@ export const PublicHeader = () => {
 
           <ul className={`nav-links${menuOpen ? " is-open" : ""}`}>
             <li>
-              <NavLink to="/" end className={({ isActive }) => (isActive ? "active" : "")}>
+              <NavLink to="/" end className={({ isActive }) => (isActive ? "active" : "")} onClick={() => setMenuOpen(false)}>
                 Home
               </NavLink>
             </li>
             <li>
-              <NavLink to="/about" className={({ isActive }) => (isActive ? "active" : "")}>
+              <NavLink to="/about" className={({ isActive }) => (isActive ? "active" : "")} onClick={() => setMenuOpen(false)}>
                 About
               </NavLink>
             </li>
@@ -184,17 +184,18 @@ export const PublicHeader = () => {
               <NavLink
                 to="/open-access"
                 className={({ isActive }) => (isActive ? "active" : "")}
+                onClick={() => setMenuOpen(false)}
               >
                 Open Access
               </NavLink>
             </li>
             <li>
-              <NavLink to="/journals" className={({ isActive }) => (isActive ? "active" : "")}>
+              <NavLink to="/journals" className={({ isActive }) => (isActive ? "active" : "")} onClick={() => setMenuOpen(false)}>
                 Journals
               </NavLink>
             </li>
             <li>
-              <NavLink to="/peer-review" className={({ isActive }) => (isActive ? "active" : "")}>
+              <NavLink to="/peer-review" className={({ isActive }) => (isActive ? "active" : "")} onClick={() => setMenuOpen(false)}>
                 Peer Review
               </NavLink>
             </li>
@@ -202,23 +203,30 @@ export const PublicHeader = () => {
               <NavLink
                 to="/author-guidelines"
                 className={({ isActive }) => (isActive ? "active" : "")}
+                onClick={() => setMenuOpen(false)}
               >
                 Author Guidelines
               </NavLink>
             </li>
             <li>
-              <NavLink to="/videos" className={({ isActive }) => (isActive ? "active" : "")}>
+              <NavLink to="/videos" className={({ isActive }) => (isActive ? "active" : "")} onClick={() => setMenuOpen(false)}>
                 Videos
               </NavLink>
             </li>
             <li>
-              <NavLink to="/ppts" className={({ isActive }) => (isActive ? "active" : "")}>
+              <NavLink to="/ppts" className={({ isActive }) => (isActive ? "active" : "")} onClick={() => setMenuOpen(false)}>
                 PPT
               </NavLink>
             </li>
             <li>
-              <NavLink to="/membership" className={({ isActive }) => (isActive ? "active" : "")}>
+              <NavLink to="/membership" className={({ isActive }) => (isActive ? "active" : "")} onClick={() => setMenuOpen(false)}>
                 Membership
+              </NavLink>
+            </li>
+            <li className="mobile-only-submission">
+              <NavLink to="/submit" className="mobile-submit-btn" onClick={() => setMenuOpen(false)}>
+                <i className="fa-solid fa-upload" />
+                Online Submission
               </NavLink>
             </li>
           </ul>

@@ -1372,8 +1372,8 @@ main {
 .about-row {
   display: flex;
   align-items: center;
-  gap: 60px;
-  margin-bottom: 150px;
+  gap: 5vh;
+  margin-bottom: 5%;
 }
 
 .about-row.reverse {
@@ -1426,11 +1426,15 @@ main {
 @media (max-width: 900px) {
   .about-row {
     flex-direction: column;
-    text-align: center;
+    text-align: left;
   }
 
   .about-image img {
     max-width: 100%;
+  }
+
+  .oa-section {
+    padding: 0 3%;
   }
 }
 
@@ -1440,8 +1444,7 @@ main {
 .oa-section {
   max-width: 1300px;
   margin: auto;
-  padding: 80px 20px;
-  margin-top: 120px;
+  padding: 2% 0;
 }
 
 /* ================= ROW LAYOUT ================= */
@@ -1449,7 +1452,7 @@ main {
   display: flex;
   align-items: center;
   gap: 60px;
-  margin-bottom: 150px;
+  margin-bottom: 6%;
 }
 
 .oa-row.reverse {
@@ -1516,9 +1519,6 @@ main {
 }
 
 
-.from-right {
-  transform: translateX(80px);
-}
 
 /* ================= ACTIVE STATE ================= */
 .show {
@@ -1665,8 +1665,7 @@ footer {
 /* ============================= *PEER REVIEW SECTION * /* ============================= */
 
 .peer-review-section {
-  padding: 100px 8%;
-  margin-top: 120px;
+  padding: 4% 8%;
 
 }
 
@@ -1704,7 +1703,7 @@ footer {
 }
 
 
-.peer-text h1 {
+.peer-review-section h1 {
   font-size: 48px;
   margin-bottom: 25px;
   color: var(--orange);
@@ -1712,7 +1711,7 @@ footer {
 
 }
 
-.peer-text h2 {
+.peer-review-section h2 {
   font-size: 28px;
   margin-bottom: 10px;
   color: var(--orange);
@@ -1728,7 +1727,7 @@ footer {
   font-family: var(--font-secondary);
 }
 
-.peer-text p,
+.peer-review-section p,
 .peer-full-text p {
   font-size: 16px;
   line-height: 1.8;
@@ -1755,10 +1754,8 @@ li {
 /* ============================================= Author-Guidelines ========================= */
 
 .author-guidelines-section {
-  padding: 100px 8%;
+  padding: 2% 8%;
   font-family: var(--font-secondary);
-  margin-top: 120px;
-  margin-top: 120px;
 }
 
 .author-container {
@@ -1767,13 +1764,13 @@ li {
   justify-content: space-between;
   gap: 20px;
   max-width: 2100px;
+  margin-bottom: 10%;
 }
 
 /* LEFT SIDE */
 .author-text {
   flex: 1;
   display: flex;
-  width: 55vw;
   flex-direction: column;
 }
 
@@ -1815,6 +1812,26 @@ li {
   margin-left: 100px;
 }
 
+@media (max-width: 900px) {
+  .author-container {
+    flex-direction: column;
+  }
+
+  .author-image {
+    text-align: center;
+    margin-top: 40px;
+    display: none;
+  }
+
+  .author-text h1 {
+    font-size: 36px;
+  }
+
+  .author-text h2 {
+    font-size: 22px;
+  }
+}
+
 /* ========================= */
 /* ANIMATION */
 /* ========================= */
@@ -1825,9 +1842,8 @@ li {
   transition: all 1s ease;
 }
 
-
-.from-right {
-  transform: translateX(80px);
+.pr-h2 {
+  margin-top: 20px;
 }
 
 .fade-up {
@@ -2047,6 +2063,7 @@ li {
   font-size: 16px;
   line-height: 1.6;
   font-family: var(--font-secondary);
+  text-align: left;
 }
 
 /* ================= TESTIMONIAL CARD ================= */
@@ -2197,14 +2214,15 @@ li {
 /* ===== Image ===== */
 .journal-image {
   flex: 0 0 220px;
-  
+
   /* ✅ fixed width */
   place-items: center;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
   margin-left: 30px;
 }
+
 .journal-image img {
-  width:80%;
+  width: 80%;
   aspect-ratio: 2 / 3;
   height: auto;
   object-fit: cover;
@@ -2219,11 +2237,11 @@ li {
 }
 
 .journal-content p {
-  font-size: 16px;
   line-height: 1.8;
   color: #555;
   font-family: var(--font-secondary);
 }
+
 /* ===== Buttons ===== */
 .journal-buttons {
   display: flex;
@@ -2252,7 +2270,7 @@ li {
 /* ==================================== Membership section styles ===============================*/
 
 .membership-section {
-  padding: 100px 0;
+  padding: 5% 0;
   font-family: 'Inter', sans-serif;
   margin-top: 120px;
 }
@@ -2746,102 +2764,162 @@ img {
 
 }
 
-
+.mobile-only-submission {
+  display: none !important;
+}
 
 /* =========================================================
    TABLET & MOBILE (768px ↓) - Hamburger Menu Breakpoint
-========================================================= */
+   ========================================================= */
 @media (max-width: 768px) {
 
   /* NAVBAR */
   .nav-content {
-    padding: 10px 20px;
+    padding: 10px 20px !important;
+    justify-content: space-between !important;
   }
 
   .nav-links {
-    position: fixed;
-    top: 108px;
-    left: 0;
-    right: 0;
-    flex-direction: column;
-    align-items: flex-start;
-    background: rgba(255, 255, 255, 0.98);
-    padding: 20px;
-    border-radius: 0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    display: none;
-    z-index: 998;
-    max-height: calc(100vh - 108px);
-    overflow-y: auto;
-    gap: 8px;
+    position: fixed !important;
+    width: 90%;
+    position: fixed !important;
+    top: 110% !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    background: rgba(255, 255, 255, 0.99) !important;
+    padding: 24px 20px !important;
+    border-radius: 0 !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+    z-index: 998 !important;
+    max-height: calc(100vh - 106px) !important;
+    overflow-y: auto !important;
+    gap: 6px !important;
+
+    /* High-end Slide & Fade Animation drawer transitions */
+    display: flex !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transform: translateY(-15px) !important;
+    transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.35s !important;
   }
 
   .nav-links.is-open {
-    display: flex;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
   }
 
   .nav-links li {
-    width: 100%;
+    width: 90% !important;
   }
 
   .nav-links a {
-    display: block;
-    padding: 12px 16px;
-    border-radius: 6px;
-    transition: background 0.2s ease;
+    display: block !important;
+    padding: 12px 16px !important;
+    border-radius: 8px !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    transition: background 0.2s ease, color 0.2s ease !important;
   }
 
   .nav-links a:hover {
-    background: #f5f5f5;
+    background: #fff6ee !important;
+    color: var(--orange) !important;
   }
 
   .nav-toggle {
-    display: flex;
+    display: flex !important;
   }
 
   .logo {
-    height: 50px;
+    height: 46px !important;
   }
 
   /* TOP BAR */
   .top-bar-content {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    align-items: center;
-    padding: 12px 20px;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 8px 16px !important;
+    background: var(--orange) !important;
+    /* Pinned search branding at top */
   }
 
   .contact {
-    position: static;
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-    text-align: center;
-  }
-
-  .contact span {
-    font-size: 13px;
-  }
-
-  .search-box {
-    width: 100%;
-    max-width: 100%;
+    display: none !important;
+    /* Ignore contact info for mobile/tablet */
   }
 
   .search-box-wrapper {
-    width: 100%;
+    width: 100% !important;
+    max-width: 480px !important;
+  }
+
+  .search-box {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 40px !important;
+    padding: 8px 16px !important;
+  }
+
+  .search-box input {
+    height: 30px !important;
+    font-size: 13px !important;
   }
 
   .right-section {
-    position: static;
-    width: 100%;
+    display: none !important;
+    /* Hide desktop submission button */
   }
 
-  .btn-primary {
-    width: 100%;
-    justify-content: center;
+  /* Mobile Submission Button styling in Hamburger drawer */
+  .mobile-only-submission {
+    display: block !important;
+    width: 100% !important;
+    margin-top: 15px !important;
+    padding: 0 10px !important;
   }
+
+  .mobile-submit-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    background: linear-gradient(135deg, var(--orange), #ffa154) !important;
+    color: #fff !important;
+    padding: 14px 20px !important;
+    border-radius: 30px !important;
+    font-weight: 700 !important;
+    font-family: var(--font-secondary) !important;
+    text-align: center !important;
+    box-shadow: 0 6px 15px rgba(255, 115, 0, 0.25) !important;
+    border: none !important;
+    width: 100% !important;
+  }
+
+  .mobile-submit-btn:hover {
+    background: var(--orange) !important;
+    color: #fff !important;
+    transform: translateY(-1px) !important;
+  }
+
+  /* TESTIMONIALS MOBILE */
+  .testimonial-section {
+    flex-direction: column !important;
+    margin: 2rem 1.5rem !important;
+    width: calc(100% - 3rem) !important;
+    gap: 30px !important;
+  }
+
+  .left-content {
+    max-width: 100% !important;
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  /* ABOUT SECTION MOBILE WIDTHS FIX */
 
   /* HERO */
   .hero {
@@ -2925,7 +3003,7 @@ img {
   /* ABOUT */
   .about-row {
     flex-direction: column !important;
-    text-align: center;
+    text-align: left;
   }
 
   .about-row.reverse {
@@ -2935,7 +3013,8 @@ img {
   /* OPEN ACCESS */
   .oa-row {
     flex-direction: column !important;
-    text-align: center;
+    text-align: left;
+    padding: 0 10%;
   }
 
   /* TESTIMONIAL */
@@ -2992,6 +3071,16 @@ img {
   .author-text h1,
   .section-title {
     font-size: 26px;
+  }
+
+  .peer-container {
+    flex-direction: column-reverse;
+    gap: 30px;
+  }
+
+  .peer-image img {
+    max-width: 280px;
+    margin: auto;
   }
 
   .hero-subtitle {
@@ -3346,9 +3435,76 @@ img {
     display: none;
   }
 }
-p{
-  text-align: justify;
-}
+
 section.about-section-main {
-    padding: 0 10rem;
+  padding: 2% 10%;
+}
+
+
+@media (max-width: 768px) {
+  .journal-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    /* gap: 30px; */
+    margin-bottom: 2rem;
+    text-align: left;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06);
+    /* padding-left: 20%;*/
+  }
+
+  .journal-content-primary p {
+    display: none;
+  }
+
+  .journal-content-primary h3 {
+    font-size: 1rem;
+  }
+
+  .journal-content-primary {
+    display: grid;
+    padding: 0;
+    overflow-y: auto;
+    font-family: "IBM Plex Serif", serif;
+  }
+
+  .journal-image {
+    flex: 1 1 40%;
+    place-items: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    margin: 4%;
+    width: 40%;
+    aspect-ratio: 2 / 3;
+  }
+
+  .rm-link {
+    display: none;
+  }
+
+  .journal-image img {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    height: auto;
+    object-fit: cover;
+  }
+
+  .btn {
+    background: #f97316;
+    color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 8px;
+    transition: 0.3s ease;
+    text-align: center;
+    font-family: var(--font-secondary);
+  }
+
+  .journal-buttons {
+    display: flex;
+    margin-top: 0.5rem;
+    gap: 10px;
+    align-items: center;
+  }
 }

@@ -224,12 +224,12 @@ export const JournalDetailPage = () => {
                               <i className="fa-solid fa-file-pdf"></i> PDF
                             </a>
                           )}
-                          {article.doi_link && (
+                          {/* {article.doi_link && (
                             // <a href={article.doi_link} target="_blank" rel="noreferrer" className="read-btn secondary">
                             //   <i className="fa-solid fa-book"></i> DOI
                             // </a>
                             <p className="article-doi">DOI: <a href={article.doi_link} target="_blank" rel="noreferrer">{article.doi_link}</a></p>
-                          )}
+                          )} */}
                         </div>
                       </article>
                     ))}
@@ -262,16 +262,19 @@ export const JournalDetailPage = () => {
                                   <div className="issue-articles">
                                     {volume.article_items.map((article) => (
                                       <div key={article._id} className="issue-article-row">
+                                      <Link to={`/article/${article._id}`}>
                                         <div className="article-info">
                                           <p className="article-row-type">{article.type}</p>
                                           <p className="article-row-title">{article.title}</p>
                                           <p className="article-row-authors">{article.authors}</p>
+                                          
                                           {article.pdf_url && (
                                             <a href={toDriveViewerUrl(article.pdf_url)} target="_blank" rel="noreferrer" className="action-link" title="View PDF">
                                               <i className="fa-solid fa-file-pdf"></i> PDF
                                             </a>
                                           )}
                                         </div>
+                                        </Link>
                                         <div className="article-row-actions">
                                           
                                           {article.doi_link && <p className="article-row-doi">DOI: <a href={article.doi_link} target="_blank" rel="noreferrer">{article.doi_link}</a></p>}
@@ -364,7 +367,7 @@ export const JournalDetailPage = () => {
               </div>
               <div className="content-body">
                 {content.ppts.length ? (
-                  <div className="ppt-grid" style={{ display: "flex", flexWrap: "wrap", gap: "1.1rem" }}>
+                  <div className="ppt-grid">
                     {content.ppts.map((ppt) => (
                       <a
                         key={ppt._id}
@@ -372,7 +375,7 @@ export const JournalDetailPage = () => {
                         target="_blank"
                         rel="noreferrer"
                         className="ppt-card"
-                        style={{ width: "calc(50% - 0.55rem)", minWidth: "250px" }}
+
                       >
                         <div className="ppt-cover">
                           {ppt.thumbnail_url ? (
@@ -414,7 +417,7 @@ export const JournalDetailPage = () => {
               </div>
               <div className="content-body">
                 {content.videos.length ? (
-                  <div className="video-grid" style={{ display: "flex", flexWrap: "wrap", gap: "1.1rem" }}>
+                  <div className="video-grid">
                     {content.videos.map((video) => (
                       <a
                         key={video._id}
@@ -422,7 +425,7 @@ export const JournalDetailPage = () => {
                         target="_blank"
                         rel="noreferrer"
                         className="video-card"
-                        style={{ width: "calc(50% - 0.55rem)", minWidth: "250px" }}
+
                       >
                         <div className="video-thumbnail">
                           {video.thumbnail_url ? (

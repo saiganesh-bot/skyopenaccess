@@ -66,7 +66,7 @@ export const JournalsPage = () => {
               <div className="journal-content-primary">
                 <h3>{journal.title}</h3>
                 <p>{truncateToWords(journal.about || "No description provided yet.", 60)}</p>
-                <a href={`/journals/${journal.slug}`}>
+                <a href={`/journals/${journal.slug}`} className="rm-link">
                   Read More...
                 </a>
 
