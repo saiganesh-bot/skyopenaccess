@@ -2961,9 +2961,11 @@ textarea:focus {
   flex-wrap: wrap;
   gap: 1.1rem;
 }
-
+.card-section h2{
+  font-size: 2.5rem;
+}
 .video-card {
-  width: 40%;
+  width: 30%;
   text-decoration: none;
   color: inherit;
   background: var(--surface);
@@ -3103,7 +3105,7 @@ textarea:focus {
   }
 
   .card-section h2 {
-    font-size: 1.5rem;
+    font-size: 2.5rem;
   }
 }
 
